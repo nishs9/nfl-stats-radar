@@ -2,11 +2,15 @@ FROM node:22.14-alpine
 
 WORKDIR /app
 
-# Install dependencies first
-COPY package.json package-lock.json* ./
-RUN npm ci --verbose
+# Add build tools needed for native modules like sqlite3
+RUN apk add --no-cache python3 make g++
 
-# Copy all application code, including the db directory with nfl_stats.db
+# Install dependencies first *inside the container*
+COPY package.json package-lock.json* ./
+# npm ci should now be able to build sqlite3 correctly for Alpine
+RUN npm ci --verbose 
+
+# Copy the rest of the application code
 COPY . .
 
 # List files for debugging (optional)

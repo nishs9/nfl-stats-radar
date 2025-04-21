@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDbConnection } from '@/lib/db';
 import { PlayerStats } from '@/types/player'; // Make sure PlayerStats is imported
 
+// Correct the type definition for the second argument using destructuring
 export async function GET(
   request: NextRequest,
-  { params }: { params: { playerId: string } }
+  { params }: { params: Promise<{ playerId: string }> } // Destructure params directly
 ) {
   try {
-    const playerId = params.playerId;
+    // Access playerId directly via the destructured params
+    const full_params = await params;
+    const playerId = full_params.playerId; 
     const searchParams = request.nextUrl.searchParams;
     const season = searchParams.get('season');
 
@@ -56,7 +59,7 @@ export async function GET(
       WHERE rn = 1
     `;
 
-    const queryParams = Array(25).fill(playerId);
+    const queryParams = Array(26).fill(playerId); // Adjusted array size based on query
     const playerInfo = await db.get(playerInfoQuery, queryParams);
 
     if (!playerInfo) {
@@ -67,7 +70,8 @@ export async function GET(
     const seasonsQuery = `
       SELECT DISTINCT season
       FROM (
-        SELECT 2023 as season FROM player_stats_season_2023 WHERE player_id = ?
+        SELECT 2024 as season FROM player_stats_season_2024 WHERE player_id = ?
+        UNION ALL SELECT 2023 FROM player_stats_season_2023 WHERE player_id = ?
         UNION ALL SELECT 2022 FROM player_stats_season_2022 WHERE player_id = ?
         UNION ALL SELECT 2021 FROM player_stats_season_2021 WHERE player_id = ?
         UNION ALL SELECT 2020 FROM player_stats_season_2020 WHERE player_id = ?
@@ -95,18 +99,22 @@ export async function GET(
       )
       ORDER BY season DESC
     `;
-
-    const seasons = await db.all(seasonsQuery, queryParams);
     
+    // Ensure queryParams has the correct length for the seasons query as well
+    const seasonsQueryParams = Array(26).fill(playerId); 
+    const seasonsResult = await db.all(seasonsQuery, seasonsQueryParams);
+    const seasons = seasonsResult.map((s: { season: number }) => s.season); // Extract season numbers
+
     // Default to the most recent season if not specified
-    const targetSeason = season || (seasons.length > 0 ? seasons[0].season : null);
+    const targetSeason = season || (seasons.length > 0 ? seasons[0] : null);
 
     // If no valid season is found, return just the player info
     if (!targetSeason) {
       return NextResponse.json({
         playerInfo,
-        seasons: seasons.map(s => s.season),
-        stats: null
+        seasons: seasons,
+        stats: null,
+        percentiles: null // Ensure percentiles is also null
       });
     }
 
@@ -123,13 +131,13 @@ export async function GET(
       const statsToCalculate = getStatsForPosition(position);
       
       if (statsToCalculate.length > 0) {
-        percentileStats = await calculatePercentiles(db, playerStats, position, targetSeason, statsToCalculate);
+        percentileStats = await calculatePercentiles(db, playerStats, position, Number(targetSeason), statsToCalculate);
       }
     }
 
     return NextResponse.json({
       playerInfo,
-      seasons: seasons.map(s => s.season),
+      seasons: seasons,
       stats: playerStats,
       percentiles: percentileStats
     });

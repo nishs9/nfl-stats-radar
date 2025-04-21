@@ -5,87 +5,87 @@ export interface Player {
   position: string;
   recent_team: string;
   headshot_url?: string;
-  season?: number;
+  season?: number; // Season from playerInfo query (most recent)
 }
 
-// Player stats and percentiles
+// Definition for a single statistic category
+export interface StatDefinition {
+  key: string;       // e.g., 'passing_epa'
+  label: string;     // e.g., 'Passing EPA'
+  description?: string; // Optional description
+  higherIsBetter?: boolean; // Optional: true if higher value is better
+}
+
+// Player stats (raw values for a season)
 export interface PlayerStats {
-  // Allow string keys with values of type string, number, or null
   [key: string]: string | number | null | undefined; 
 }
 
+// Percentile stats (calculated percentiles for a season)
 export interface PercentileStats {
-  [key: string]: number;
+  [key: string]: number; // Key matches StatDefinition.key
 }
 
-// API response types
+// API response for player search suggestions
 export interface PlayerSearchResponse {
   player_id: string;
   player_display_name: string;
   recent_team: string;
-  position: string;
+  position: string; // Include position in search results
 }
 
+// API response for the main player page data
 export interface PlayerDataResponse {
   playerInfo: Player;
-  seasons: number[];
-  stats: PlayerStats | null;
-  percentiles: PercentileStats | null;
+  seasons: number[]; // Array of available seasons
+  stats: PlayerStats | null; // Stats for the selected season
+  percentiles: PercentileStats | null; // Percentiles for the selected season
 }
 
-// Stat category types for visualization
-export interface StatCategory {
-  key: string;
-  label: string;
-  description: string;
-  higherIsBetter: boolean;
-}
+// Helper function (can stay here or move to utils)
+// This should return StatDefinition[] now
+export function getStatsForPosition(position: string): StatDefinition[] {
+  const positionStatsMap: Record<string, StatDefinition[]> = {
+    'QB': [
+      { key: 'passing_epa', label: 'Passing EPA', higherIsBetter: true },
+      { key: 'passing_yards', label: 'Passing Yards', higherIsBetter: true },
+      { key: 'passing_air_yards', label: 'Air Yards', higherIsBetter: true },
+      { key: 'comp_pct', label: 'Completion %', higherIsBetter: true },
+      { key: 'sack_rate', label: 'Sack Rate', higherIsBetter: false }, // Example: Lower is better
+      { key: 'rushing_epa', label: 'Rushing EPA', higherIsBetter: true },
+      { key: 'rushing_yards', label: 'Rushing Yards', higherIsBetter: true },
+      { key: 'pacr', label: 'PACR', higherIsBetter: true },
+    ],
+    'RB': [
+      { key: 'rushing_epa', label: 'Rushing EPA', higherIsBetter: true },
+      { key: 'rushing_yards', label: 'Rushing Yards', higherIsBetter: true },
+      { key: 'receiving_epa', label: 'Receiving EPA', higherIsBetter: true },
+      { key: 'receiving_yards', label: 'Receiving Yards', higherIsBetter: true },
+      { key: 'target_share', label: 'Target Share', higherIsBetter: true },
+      { key: 'air_yards_share', label: 'Air Yards Share', higherIsBetter: true },
+      { key: 'racr', label: 'RACR', higherIsBetter: true },
+    ],
+    'WR': [
+      { key: 'receiving_epa', label: 'Receiving EPA', higherIsBetter: true },
+      { key: 'receiving_yards', label: 'Receiving Yards', higherIsBetter: true },
+      { key: 'target_share', label: 'Target Share', higherIsBetter: true },
+      { key: 'air_yards_share', label: 'Air Yards Share', higherIsBetter: true },
+      { key: 'racr', label: 'RACR', higherIsBetter: true },
+      { key: 'wopr', label: 'WOPR', higherIsBetter: true },
+    ],
+    'TE': [
+      { key: 'receiving_epa', label: 'Receiving EPA', higherIsBetter: true },
+      { key: 'receiving_yards', label: 'Receiving Yards', higherIsBetter: true },
+      { key: 'target_share', label: 'Target Share', higherIsBetter: true },
+      { key: 'air_yards_share', label: 'Air Yards Share', higherIsBetter: true },
+      { key: 'racr', label: 'RACR', higherIsBetter: true },
+      { key: 'wopr', label: 'WOPR', higherIsBetter: true },
+    ]
+  };
 
-// Position-specific stat categories
-export const QB_STATS: StatCategory[] = [
-  { key: 'passing_air_yards', label: 'Attempted Air Yards', description: 'Total air yards on all pass attempts', higherIsBetter: true },
-  { key: 'passing_yards', label: 'Passing Yards', description: 'Total passing yards on completions', higherIsBetter: true },
-  { key: 'passing_epa', label: 'Passing EPA', description: 'The total expected points added on pass plays', higherIsBetter: true },
-  { key: 'comp_pct', label: 'Pass Completion %', description: 'Percentage of pass attempts that are successfully completed', higherIsBetter: true },
-  { key: 'sack_rate', label: 'Sack Rate', description: 'Percentage of dropbacks that resulted in a sack', higherIsBetter: false },
-  { key: 'rushing_epa', label: 'Rushing EPA', description: 'The total expected points added on rushing plays', higherIsBetter: true },
-  { key: 'rushing_yards', label: 'Rushing Yards', description: 'Total rushing yards', higherIsBetter: true },
-  { key: 'pacr', label: 'PACR', description: 'Passing Air Yards Conversion Ratio: The ratio of total passing yards to air yards per game', higherIsBetter: true }
-];
-
-export const RB_STATS: StatCategory[] = [
-  { key: 'rushing_epa', label: 'Rushing EPA', description: 'The total expected points added on rushing plays', higherIsBetter: true },
-  { key: 'rushing_yards', label: 'Rushing Yards', description: 'Total rushing yards', higherIsBetter: true },
-  { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added on receptions', higherIsBetter: true },
-  { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
-  { key: 'target_share', label: 'Target Share', description: 'The percentage of targets received in relation to the rest of the team', higherIsBetter: true },
-  { key: 'air_yards_share', label: 'Air Yards Share', description: 'The percentage of attempted air yards received in relation to the rest of the team', higherIsBetter: true },
-  { key: 'yac%', label: 'YAC %', description: 'The ratio of yards after catch to total receiving yards', higherIsBetter: true },
-  { key: 'racr', label: 'RACR', description: 'Receiving Air Yards Conversion Ratio: The ratio of total receiving yards to air yards per game', higherIsBetter: true }
-];
-
-export const WR_TE_STATS: StatCategory[] = [
-  { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added on receptions', higherIsBetter: true },
-  { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
-  { key: 'target_share', label: 'Target Share', description: 'The percentage of targets received in relation to the rest of the team', higherIsBetter: true },
-  { key: 'air_yards_share', label: 'Air Yards Share', description: 'The percentage of attempted air yards received in relation to the rest of the team', higherIsBetter: true },
-  { key: 'yac%', label: 'YAC %', description: 'The ratio of yards after catch to total receiving yards', higherIsBetter: true },
-  { key: 'racr', label: 'RACR', description: 'Receiving Air Yards Conversion Ratio: The ratio of total receiving yards to air yards per game', higherIsBetter: true },
-  { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rating: Rating of total fantasy usage', higherIsBetter: true }
-];
-
-export const DEFAULT_STATS: StatCategory[] = [
-  { key: 'games', label: 'Games Played', description: 'Number of games played', higherIsBetter: true },
-  { key: 'turnovers', label: 'Turnovers', description: 'Total turnovers (fumbles + interceptions)', higherIsBetter: false },
-  { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Total fantasy points scored in PPR leagues', higherIsBetter: true }
-];
-
-export function getStatsForPosition(position: string): StatCategory[] {
-  switch (position) {
-    case 'QB': return QB_STATS;
-    case 'RB': return RB_STATS;
-    case 'WR': return WR_TE_STATS;
-    case 'TE': return WR_TE_STATS;
-    default: return DEFAULT_STATS;
-  }
+  // Default stats if position not found
+  return positionStatsMap[position] || [
+    { key: 'games', label: 'Games Played', higherIsBetter: true },
+    { key: 'offensive_snaps', label: 'Offensive Snaps', higherIsBetter: true },
+  ];
 }

@@ -1,30 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react'; 
 import { useRouter } from 'next/navigation';
-import { PlayerDataResponse, getStatsForPosition, Player } from '@/types/player'; // Import Player type
+import { PlayerDataResponse, getStatsForPosition } from '@/types/player'; 
 import PercentileSlider from '@/components/PercentileSlider';
-import Image from 'next/image'; // Keep this import
+import Image from 'next/image'; 
 
-export default function PlayerPage({ params }: { params: { playerId: string } }) {
+// Try using PageProps directly
+export default function PlayerPage({params}: {params: Promise<{ playerId: string }>}) {
   const [playerData, setPlayerData] = useState<PlayerDataResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [imageError, setImageError] = useState(false);
   const router = useRouter();
+  
+  // params should be directly usable here in a client component
+  const playerId = use(params).playerId; // Extract playerId from params
 
-  // Extract playerId outside useEffect
-  const playerId = params.playerId;
-
-  // Fetch player data when component mounts or when selectedSeason changes
   useEffect(() => {
     async function fetchPlayerData() {
+      // ... fetch logic ...
       setIsLoading(true);
       setImageError(false);
       try {
         const seasonParam = selectedSeason ? `?season=${selectedSeason}` : '';
-        // Use the extracted playerId variable here
+        // Use the extracted playerId
         const response = await fetch(`/api/player/${playerId}${seasonParam}`); 
         
         if (!response.ok) {
@@ -34,8 +35,7 @@ export default function PlayerPage({ params }: { params: { playerId: string } })
         const data: PlayerDataResponse = await response.json();
         setPlayerData(data);
         
-        // Set the selected season to the current one if not already selected
-        if (!selectedSeason && data.seasons.length > 0) {
+        if (selectedSeason === null && data.seasons && data.seasons.length > 0) {
           setSelectedSeason(data.seasons[0]);
         }
       } catch (err) {
@@ -46,41 +46,35 @@ export default function PlayerPage({ params }: { params: { playerId: string } })
       }
     }
 
-    // Only run fetchPlayerData if playerId is available
     if (playerId) {
       fetchPlayerData();
     }
-  // Use the extracted playerId variable in the dependency array
   }, [playerId, selectedSeason]); 
 
-  // Handle season change
+  // ... (rest of the component logic remains the same) ...
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSeason(Number(e.target.value));
   };
 
-  // Get placeholder image URL if headshot_url is not available or loading fails
   const getDefaultImageUrl = (position: string) => {
-    // Return a position-specific silhouette or a generic player image
     const positionImages: Record<string, string> = {
       'QB': '/images/default-qb.png',
       'RB': '/images/default-rb.png',
       'WR': '/images/default-wr.png',
       'TE': '/images/default-te.png',
     };
-    
     return positionImages[position] || "https://via.placeholder.com/128?text=NFL";
   };
 
-  if (isLoading) {
+  if (isLoading) { /* ... loading JSX ... */ 
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-
-  if (error || !playerData) {
-    return (
+  if (error || !playerData) { /* ... error JSX ... */ 
+     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
           {error || 'Could not load player data'}
@@ -96,10 +90,10 @@ export default function PlayerPage({ params }: { params: { playerId: string } })
   }
 
   const { playerInfo, seasons, stats, percentiles } = playerData;
-  const statCategories = getStatsForPosition(playerInfo.position);
+  const statDefinitions = getStatsForPosition(playerInfo.position); 
   const fallbackSrc = getDefaultImageUrl(playerInfo.position);
 
-  return (
+  return ( /* ... component JSX ... */ 
     <div className="max-w-4xl mx-auto px-4 py-8">
       <button 
         className="mb-8 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
@@ -109,28 +103,23 @@ export default function PlayerPage({ params }: { params: { playerId: string } })
       </button>
 
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        {/* Player Header */}
         <div className="bg-gray-800 text-white p-6">
-          <div className="flex flex-col md:flex-row items-center md:items-start">
+           <div className="flex flex-col md:flex-row items-center md:items-start">
             <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-6 bg-gray-700">
               <Image 
-                // Use headshot_url if available and no error, otherwise use fallback
                 src={!imageError && playerInfo.headshot_url ? playerInfo.headshot_url : fallbackSrc}
                 alt={playerInfo.player_display_name}
-                layout="fill" // Use fill to cover the container
-                objectFit="cover" // Maintain aspect ratio
+                layout="fill" 
+                objectFit="cover" 
                 onError={() => {
-                  if (!imageError) setImageError(true); // Set error only once
+                  if (!imageError) setImageError(true); 
                 }}
-                // Add unoptimized prop if using external URLs without domain config
-                // unoptimized={true} 
               />
             </div>
             <div className="flex-1 text-center md:text-left">
               <h1 className="text-3xl font-bold">{playerInfo.player_display_name}</h1>
               <div className="text-xl text-gray-300 mt-1">{playerInfo.position} • {playerInfo.recent_team}</div>
               
-              {/* Season Selector */}
               <div className="mt-4">
                 <label htmlFor="season" className="block text-sm font-medium text-gray-300">
                   Season
@@ -150,24 +139,22 @@ export default function PlayerPage({ params }: { params: { playerId: string } })
           </div>
         </div>
 
-        {/* Percentile Sliders */}
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Percentile Rankings</h2>
+          <h2 className="text-2xl font-bold mb-6">Percentile Rankings ({selectedSeason})</h2>
           
           {!stats || !percentiles ? (
             <div className="text-gray-500">No stats available for the selected season.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-              {statCategories.map((stat) => {
-                // Only show the stat if it has a percentile value
-                if (percentiles[stat.key] === undefined) return null;
+              {statDefinitions.map((statDef) => { 
+                if (percentiles[statDef.key] === undefined) return null;
                 
                 return (
                   <PercentileSlider 
-                    key={stat.key}
-                    stat={stat}
-                    percentile={percentiles[stat.key]}
-                    value={stats[stat.key] ?? undefined}
+                    key={statDef.key}
+                    stat={statDef} 
+                    percentile={percentiles[statDef.key]}
+                    value={stats[statDef.key]} 
                   />
                 );
               })}
