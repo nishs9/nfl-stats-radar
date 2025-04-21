@@ -8,7 +8,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'static.www.nfl.com',
         port: '',
-        pathname: '/image/private/**', // Adjust pathname if needed, this allows any path under /image/private/
+        pathname: '/image/upload/**', // Adjust pathname if needed, this allows any path under /image/upload/
       },
       // Add other hostnames if needed, e.g., for your placeholder
       {

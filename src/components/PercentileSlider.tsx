@@ -29,7 +29,11 @@ export default function PercentileSlider({ stat, percentile, value }: Percentile
   
   useEffect(() => {
     const timer = setTimeout(() => {
-      setAnimatedPercentile(percentile);
+      if (stat.key == 'total_turnovers' && percentile == 0) {
+        setAnimatedPercentile(1);
+      } else {
+        setAnimatedPercentile(percentile);
+      }   
     }, 100);
     return () => clearTimeout(timer);
   }, [percentile]);

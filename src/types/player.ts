@@ -51,10 +51,12 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'passing_yards', label: 'Passing Yards', higherIsBetter: true },
       { key: 'passing_air_yards', label: 'Air Yards', higherIsBetter: true },
       { key: 'comp_pct', label: 'Completion %', higherIsBetter: true },
-      { key: 'sack_rate', label: 'Sack Rate', higherIsBetter: false }, // Example: Lower is better
+      { key: 'sack_rate', label: 'Sack Rate', higherIsBetter: false },
       { key: 'rushing_epa', label: 'Rushing EPA', higherIsBetter: true },
       { key: 'rushing_yards', label: 'Rushing Yards', higherIsBetter: true },
       { key: 'pacr', label: 'PACR', higherIsBetter: true },
+      { key: 'total_turnovers', label: 'Total Turnovers', higherIsBetter: false },
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', higherIsBetter: true }
     ],
     'RB': [
       { key: 'rushing_epa', label: 'Rushing EPA', higherIsBetter: true },
@@ -64,6 +66,8 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'target_share', label: 'Target Share', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', higherIsBetter: true },
       { key: 'racr', label: 'RACR', higherIsBetter: true },
+      { key: 'total_turnovers', label: 'Total Turnovers', higherIsBetter: false },
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', higherIsBetter: true }
     ],
     'WR': [
       { key: 'receiving_epa', label: 'Receiving EPA', higherIsBetter: true },
@@ -72,6 +76,8 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'air_yards_share', label: 'Air Yards Share', higherIsBetter: true },
       { key: 'racr', label: 'RACR', higherIsBetter: true },
       { key: 'wopr', label: 'WOPR', higherIsBetter: true },
+      { key: 'total_turnovers', label: 'Total Turnovers', higherIsBetter: false },
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', higherIsBetter: true }
     ],
     'TE': [
       { key: 'receiving_epa', label: 'Receiving EPA', higherIsBetter: true },
@@ -80,12 +86,13 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'air_yards_share', label: 'Air Yards Share', higherIsBetter: true },
       { key: 'racr', label: 'RACR', higherIsBetter: true },
       { key: 'wopr', label: 'WOPR', higherIsBetter: true },
+      { key: 'total_turnovers', label: 'Total Turnovers', higherIsBetter: false },
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', higherIsBetter: true }
     ]
   };
 
   // Default stats if position not found
   return positionStatsMap[position] || [
-    { key: 'games', label: 'Games Played', higherIsBetter: true },
-    { key: 'offensive_snaps', label: 'Offensive Snaps', higherIsBetter: true },
+    { key: 'games', label: 'Games Played', higherIsBetter: true }
   ];
 }
