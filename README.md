@@ -26,12 +26,7 @@ npm install
 yarn install
 ```
 
-3. Set up the database:
-```bash
-# The database will be automatically initialized on first run
-```
-
-4. Start the development server:
+3. Start the development server:
 ```bash
 npm run dev
 # or
