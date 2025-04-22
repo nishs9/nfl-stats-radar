@@ -36,7 +36,7 @@ export default function PercentileSlider({ stat, percentile, value }: Percentile
       }   
     }, 100);
     return () => clearTimeout(timer);
-  }, [percentile]);
+  }, [percentile, stat.key]);
 
   // Determine color based on percentile and whether higher is better
   const getColor = () => {

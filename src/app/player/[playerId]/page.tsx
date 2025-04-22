@@ -4,7 +4,7 @@ import React, { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PlayerDataResponse, getStatsForPosition } from '@/types/player'; 
 import PercentileSlider from '@/components/PercentileSlider';
-import Image from 'next/image'; 
+import Image from 'next/image';
 
 // Try using PageProps directly
 export default function PlayerPage({params}: {params: Promise<{ playerId: string }>}) {
@@ -56,14 +56,8 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     setSelectedSeason(Number(e.target.value));
   };
 
-  const getDefaultImageUrl = (position: string) => {
-    const positionImages: Record<string, string> = {
-      'QB': '/images/default-qb.png',
-      'RB': '/images/default-rb.png',
-      'WR': '/images/default-wr.png',
-      'TE': '/images/default-te.png',
-    };
-    return positionImages[position] || "https://via.placeholder.com/128?text=NFL";
+  const getDefaultImageUrl = () => {
+    return "/placeholder.jpg";
   };
 
   if (isLoading) { /* ... loading JSX ... */ 
@@ -91,7 +85,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
 
   const { playerInfo, seasons, stats, percentiles } = playerData;
   const statDefinitions = getStatsForPosition(playerInfo.position); 
-  const fallbackSrc = getDefaultImageUrl(playerInfo.position);
+  const fallbackSrc = getDefaultImageUrl();
 
   return ( /* ... component JSX ... */ 
     <div className="max-w-4xl mx-auto px-4 py-8">

@@ -76,7 +76,7 @@ export default function PlayerSearch() {
   }
 
   return (
-    <div className="w-full max-w-md" ref={searchRef}>
+    <div className="w-full max-w-md mx-auto" ref={searchRef}>
       <form onSubmit={handleSearch} className="relative">
         <input
           type="text"
