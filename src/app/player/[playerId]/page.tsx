@@ -134,7 +134,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         </div>
 
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Percentile Rankings ({selectedSeason})</h2>
+          <h2 className="text-2xl font-bold mb-6">Statistical Rankings for {selectedSeason}</h2>
           
           {!stats || !percentiles ? (
             <div className="text-gray-500">No stats available for the selected season.</div>

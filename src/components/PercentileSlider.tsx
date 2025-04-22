@@ -51,7 +51,15 @@ export default function PercentileSlider({ stat, percentile, value }: Percentile
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-sm font-medium text-gray-700">{stat.label}</span>
+        <div className="relative group">
+          <span className="text-sm font-medium text-gray-700 cursor-help">{stat.label}</span>
+          {stat.description && (
+            <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-lg p-2 shadow-lg z-10">
+              {stat.description}
+              <div className="absolute bottom-[-6px] left-3 w-3 h-3 bg-gray-900 transform rotate-45"></div>
+            </div>
+          )}
+        </div>
         <span className="text-sm font-semibold text-blue-600">
           {displayValue !== null && displayValue !== undefined ? displayValue : 'N/A'} 
           <span className="text-xs text-gray-500 ml-1">({displayPercentile}{getOrdinalSuffix(percentile)} %ile)</span>
@@ -63,7 +71,6 @@ export default function PercentileSlider({ stat, percentile, value }: Percentile
           style={{ width: `${animatedPercentile}%` }}
         ></div>
       </div>
-      {stat.description && <div className="text-xs text-gray-500 mt-1">{stat.description}</div>}
     </div>
   );
 }
