@@ -4,6 +4,64 @@ A project for visualizing NFL player statistics. The main feature of this web ap
 
 **Live Demo**: [https://nfl-stats-radar-production.up.railway.app/](https://nfl-stats-radar-production.up.railway.app/)
 
+## Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Git
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/nfl-stats-radar.git
+cd nfl-stats-radar
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up the database:
+```bash
+# The database will be automatically initialized on first run
+```
+
+4. Start the development server:
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+The application will be available at `http://localhost:3000`
+
+### Development
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
+
+### Docker Support
+
+The project also includes Docker support for containerized development and deployment:
+
+1. Build the Docker image:
+```bash
+docker build -t nfl-stats-radar .
+```
+
+2. Run the container:
+```bash
+docker run -p 8080:8080 nfl-stats-radar
+```
+
 ## License
 
 MIT
