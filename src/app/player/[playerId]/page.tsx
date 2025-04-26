@@ -148,7 +148,9 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                     key={statDef.key}
                     stat={statDef} 
                     percentile={percentiles[statDef.key]}
-                    value={stats[statDef.key]} 
+                    value={stats[statDef.key]}
+                    playerId={playerId}
+                    season={selectedSeason || 0}
                   />
                 );
               })}

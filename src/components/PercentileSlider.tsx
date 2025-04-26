@@ -3,11 +3,14 @@
 import { StatDefinition } from '@/types/player'; // Use StatDefinition
 import { useEffect, useState } from 'react';
 import { formatNumber } from '@/lib/utils'; 
+import { useRouter } from 'next/navigation';
 
 interface PercentileSliderProps {
   stat: StatDefinition; // Use StatDefinition
   percentile: number;
   value: string | number | null | undefined; 
+  playerId: string;
+  season: number;
 }
 
 // Utility function to get the ordinal suffix
@@ -22,7 +25,14 @@ function getOrdinalSuffix(num: number): string {
   }
 }
 
-export default function PercentileSlider({ stat, percentile, value }: PercentileSliderProps) {
+export default function PercentileSlider({ 
+  stat, 
+  percentile, 
+  value,
+  playerId,
+  season
+}: PercentileSliderProps) {
+  const router = useRouter();
   const [animatedPercentile, setAnimatedPercentile] = useState(0);
   const displayValue = formatNumber(value); 
   const displayPercentile = formatNumber(percentile); 
@@ -48,8 +58,15 @@ export default function PercentileSlider({ stat, percentile, value }: Percentile
     return 'bg-red-500'; // Low percentile (bad)
   };
 
+  const handleStatClick = () => {
+    router.push(`/player/${playerId}/${season}/stats/${stat.key}`);
+  };
+
   return (
-    <div className="mb-6">
+    <div 
+      className="mb-6 cursor-pointer transition-transform hover:scale-[1.02] hover:shadow-md rounded-lg p-2"
+      onClick={handleStatClick}
+    >
       <div className="flex justify-between items-center mb-1">
         <div className="relative group">
           <span className="text-sm font-medium text-gray-700 cursor-help">{stat.label}</span>

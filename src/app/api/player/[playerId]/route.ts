@@ -26,32 +26,32 @@ export async function GET(
         SELECT player_id, player_display_name, position, recent_team, headshot_url, season,
                ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY season DESC) as rn
         FROM (
-          SELECT player_id, player_display_name, position, recent_team, headshot_url, 2024 as season FROM player_stats_season_2024 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2023 FROM player_stats_season_2023 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2022 FROM player_stats_season_2022 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2021 FROM player_stats_season_2021 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2020 FROM player_stats_season_2020 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2019 FROM player_stats_season_2019 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2018 FROM player_stats_season_2018 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2017 FROM player_stats_season_2017 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2016 FROM player_stats_season_2016 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2015 FROM player_stats_season_2015 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2014 FROM player_stats_season_2014 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2013 FROM player_stats_season_2013 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2012 FROM player_stats_season_2012 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2011 FROM player_stats_season_2011 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2010 FROM player_stats_season_2010 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2009 FROM player_stats_season_2009 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2008 FROM player_stats_season_2008 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2007 FROM player_stats_season_2007 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2006 FROM player_stats_season_2006 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2005 FROM player_stats_season_2005 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2004 FROM player_stats_season_2004 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2003 FROM player_stats_season_2003 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2002 FROM player_stats_season_2002 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2001 FROM player_stats_season_2001 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2000 FROM player_stats_season_2000 WHERE player_id = ?
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 1999 FROM player_stats_season_1999 WHERE player_id = ?
+          SELECT player_id, player_display_name, position, recent_team, headshot_url, 2024 as season FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2023 FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2022 FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2021 FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2020 FROM player_stats_season_2020 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2019 FROM player_stats_season_2019 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2018 FROM player_stats_season_2018 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2017 FROM player_stats_season_2017 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2016 FROM player_stats_season_2016 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2015 FROM player_stats_season_2015 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2014 FROM player_stats_season_2014 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2013 FROM player_stats_season_2013 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2012 FROM player_stats_season_2012 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2011 FROM player_stats_season_2011 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2010 FROM player_stats_season_2010 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2009 FROM player_stats_season_2009 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2008 FROM player_stats_season_2008 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2007 FROM player_stats_season_2007 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2006 FROM player_stats_season_2006 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2005 FROM player_stats_season_2005 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2004 FROM player_stats_season_2004 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2003 FROM player_stats_season_2003 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2002 FROM player_stats_season_2002 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2001 FROM player_stats_season_2001 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2000 FROM player_stats_season_2000 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 1999 FROM player_stats_season_1999 WHERE player_id = ? AND season_type = 'REG'
         )
       )
       SELECT player_id, player_display_name, position, recent_team, headshot_url, season
@@ -70,32 +70,32 @@ export async function GET(
     const seasonsQuery = `
       SELECT DISTINCT season
       FROM (
-        SELECT 2024 as season FROM player_stats_season_2024 WHERE player_id = ?
-        UNION ALL SELECT 2023 FROM player_stats_season_2023 WHERE player_id = ?
-        UNION ALL SELECT 2022 FROM player_stats_season_2022 WHERE player_id = ?
-        UNION ALL SELECT 2021 FROM player_stats_season_2021 WHERE player_id = ?
-        UNION ALL SELECT 2020 FROM player_stats_season_2020 WHERE player_id = ?
-        UNION ALL SELECT 2019 FROM player_stats_season_2019 WHERE player_id = ?
-        UNION ALL SELECT 2018 FROM player_stats_season_2018 WHERE player_id = ?
-        UNION ALL SELECT 2017 FROM player_stats_season_2017 WHERE player_id = ?
-        UNION ALL SELECT 2016 FROM player_stats_season_2016 WHERE player_id = ?
-        UNION ALL SELECT 2015 FROM player_stats_season_2015 WHERE player_id = ?
-        UNION ALL SELECT 2014 FROM player_stats_season_2014 WHERE player_id = ?
-        UNION ALL SELECT 2013 FROM player_stats_season_2013 WHERE player_id = ?
-        UNION ALL SELECT 2012 FROM player_stats_season_2012 WHERE player_id = ?
-        UNION ALL SELECT 2011 FROM player_stats_season_2011 WHERE player_id = ?
-        UNION ALL SELECT 2010 FROM player_stats_season_2010 WHERE player_id = ?
-        UNION ALL SELECT 2009 FROM player_stats_season_2009 WHERE player_id = ?
-        UNION ALL SELECT 2008 FROM player_stats_season_2008 WHERE player_id = ?
-        UNION ALL SELECT 2007 FROM player_stats_season_2007 WHERE player_id = ?
-        UNION ALL SELECT 2006 FROM player_stats_season_2006 WHERE player_id = ?
-        UNION ALL SELECT 2005 FROM player_stats_season_2005 WHERE player_id = ?
-        UNION ALL SELECT 2004 FROM player_stats_season_2004 WHERE player_id = ?
-        UNION ALL SELECT 2003 FROM player_stats_season_2003 WHERE player_id = ?
-        UNION ALL SELECT 2002 FROM player_stats_season_2002 WHERE player_id = ?
-        UNION ALL SELECT 2001 FROM player_stats_season_2001 WHERE player_id = ?
-        UNION ALL SELECT 2000 FROM player_stats_season_2000 WHERE player_id = ?
-        UNION ALL SELECT 1999 FROM player_stats_season_1999 WHERE player_id = ?
+        SELECT 2024 as season FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2023 FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2022 FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2021 FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2020 FROM player_stats_season_2020 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2019 FROM player_stats_season_2019 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2018 FROM player_stats_season_2018 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2017 FROM player_stats_season_2017 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2016 FROM player_stats_season_2016 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2015 FROM player_stats_season_2015 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2014 FROM player_stats_season_2014 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2013 FROM player_stats_season_2013 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2012 FROM player_stats_season_2012 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2011 FROM player_stats_season_2011 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2010 FROM player_stats_season_2010 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2009 FROM player_stats_season_2009 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2008 FROM player_stats_season_2008 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2007 FROM player_stats_season_2007 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2006 FROM player_stats_season_2006 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2005 FROM player_stats_season_2005 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2004 FROM player_stats_season_2004 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2003 FROM player_stats_season_2003 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2002 FROM player_stats_season_2002 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2001 FROM player_stats_season_2001 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2000 FROM player_stats_season_2000 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 1999 FROM player_stats_season_1999 WHERE player_id = ? AND season_type = 'REG'
       )
       ORDER BY season DESC
     `;
@@ -119,7 +119,7 @@ export async function GET(
     }
 
     // Get player stats for the specified season
-    const statsQuery = `SELECT * FROM player_stats_season_${targetSeason} WHERE player_id = ?`;
+    const statsQuery = `SELECT * FROM player_stats_season_${targetSeason} WHERE player_id = ? AND season_type = 'REG'`;
     const playerStats = await db.get(statsQuery, [playerId]);
 
     // If player stats for that season exist, calculate percentiles
@@ -178,10 +178,10 @@ async function calculatePercentiles(
     
     const percentileQuery = `
       SELECT
-        (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM player_stats_season_${season} WHERE position = ? AND ${stat} IS NOT NULL))
+        (COUNT(*) * 100.0 / (SELECT COUNT(*) FROM player_stats_season_${season} WHERE position = ? AND ${stat} IS NOT NULL AND season_type = 'REG'))
         AS percentile
       FROM player_stats_season_${season}
-      WHERE position = ? AND ${stat} IS NOT NULL AND ${stat} < ?
+      WHERE position = ? AND ${stat} IS NOT NULL AND ${stat} < ? AND season_type = 'REG'
     `;
     
     // Use dbConnection instead of db for database operations
