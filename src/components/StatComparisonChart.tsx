@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import * as d3 from 'd3';
 import type { StatComparisonResponse } from '@/types/api';
 
@@ -30,6 +31,7 @@ export default function StatComparisonChart({
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,12 +138,18 @@ export default function StatComparisonChart({
       .attr('fill', d => d.playerId === playerId ? '#ef4444' : '#3b82f6')
       .attr('stroke', d => d.playerId === playerId ? '#b91c1c' : '#2563eb')
       .attr('stroke-width', d => d.playerId === playerId ? 2 : 1)
+      .style('cursor', 'pointer')
+      .on('click', (event, d) => {
+        // Navigate to the clicked player's profile page with the season as a query parameter
+        router.push(`/player/${d.playerId}?season=${season}`);
+      })
       .on('mouseover', (event, d) => {
         tooltip
           .style('visibility', 'visible')
           .html(`
             <div class="font-bold">${d.name}</div>
             <div>${statType}: ${d.value.toFixed(1)}</div>
+            <div class="text-xs text-gray-300 mt-1">Click to view player's stat profile</div>
           `);
         
         d3.select(event.currentTarget)

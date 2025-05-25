@@ -1,7 +1,7 @@
 'use client';
 
 import React, { use, useState, useEffect } from 'react'; 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { PlayerDataResponse, getStatsForPosition } from '@/types/player'; 
 import PercentileSlider from '@/components/PercentileSlider';
 import Image from 'next/image';
@@ -14,9 +14,18 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [imageError, setImageError] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   // params should be directly usable here in a client component
   const playerId = use(params).playerId; // Extract playerId from params
+
+  // Read season from URL query parameters on mount
+  useEffect(() => {
+    const seasonFromUrl = searchParams.get('season');
+    if (seasonFromUrl && !isNaN(Number(seasonFromUrl))) {
+      setSelectedSeason(Number(seasonFromUrl));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchPlayerData() {
@@ -35,7 +44,8 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         const data: PlayerDataResponse = await response.json();
         setPlayerData(data);
         
-        if (selectedSeason === null && data.seasons && data.seasons.length > 0) {
+        // Only set default season if no season was specified in URL and selectedSeason is still null
+        if (selectedSeason === null && data.seasons && data.seasons.length > 0 && !searchParams.get('season')) {
           setSelectedSeason(data.seasons[0]);
         }
       } catch (err) {
@@ -49,7 +59,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     if (playerId) {
       fetchPlayerData();
     }
-  }, [playerId, selectedSeason]); 
+  }, [playerId, selectedSeason, searchParams]);
 
   // ... (rest of the component logic remains the same) ...
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

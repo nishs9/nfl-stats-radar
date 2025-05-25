@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
         SELECT player_id, player_display_name, recent_team, season,
                ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY season DESC) as rn
         FROM (
-          SELECT player_id, player_display_name, recent_team, 2023 as season FROM player_stats_season_2023
+          SELECT player_id, player_display_name, recent_team, 2024 as season FROM player_stats_season_2024
+          UNION ALL SELECT player_id, player_display_name, recent_team, 2023 FROM player_stats_season_2023
           UNION ALL SELECT player_id, player_display_name, recent_team, 2022 FROM player_stats_season_2022
           UNION ALL SELECT player_id, player_display_name, recent_team, 2021 FROM player_stats_season_2021
           UNION ALL SELECT player_id, player_display_name, recent_team, 2020 FROM player_stats_season_2020

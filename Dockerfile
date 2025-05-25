@@ -18,12 +18,12 @@ RUN ls -la
 RUN ls -la db/
 
 # Build the application
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Set production environment
-ENV NODE_ENV production
-ENV PORT 8080
+ENV NODE_ENV=production
+ENV PORT=8080
 
 # Expose the port
 EXPOSE 8080
