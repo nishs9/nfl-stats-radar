@@ -76,7 +76,7 @@ export default function PlayerSearch() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto" ref={searchRef}>
+    <div className="w-full max-w-md mx-auto relative min-h-0" ref={searchRef}>
       <form onSubmit={handleSearch} className="relative">
         <input
           type="text"
@@ -104,7 +104,7 @@ export default function PlayerSearch() {
         )}
 
         {showResults && results.length > 0 && (
-          <div className="absolute z-10 w-full bg-white mt-1 border rounded-md shadow-lg max-h-96 overflow-y-auto">
+          <div className="absolute z-10 w-full bg-white mt-1 border rounded-md shadow-lg max-h-72 overflow-y-auto">
             <ul>
               {results.map((player) => (
                 <li key={player.player_id} className="border-b last:border-b-0">
