@@ -8,14 +8,13 @@ A project for visualizing NFL player statistics. The main feature of this web ap
 - Search for any NFL player (QB/RB/WR/TE) who has played since 1999
 - Player profiles with rankings in key statistics
 - Visualizations:
-  - Distribution charts showing how a player's stats compare to the rest of the league
+  - Charts showing how a player's stats compare to the rest of the league
   - Percentile sliders for easy visual comparison (similar to Baseball Savant)
 - Season selection to view stats from any year in a player's career
 
 ## Future Features + Plans
 - Additional types of visualizations along with real-time customizastion
 - Player radar charts (i.e. something similar to the attribute radar charts in FIFA)
-- More robust deployment strategy
 
 ## Getting Started
 
