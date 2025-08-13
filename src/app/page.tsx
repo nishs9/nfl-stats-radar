@@ -5,10 +5,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Dark header section */}
-      <div className="w-full bg-gray-800 text-white flex flex-col items-center py-12 px-4">
+      <div className="w-full text-white flex flex-col items-center py-12 px-4" style={{ backgroundColor: 'var(--brand-primary)' }}>
         <div className="relative w-20 h-20 mb-2">
           <Image
-            src="/site_logo.jpg"
+            src="/site_logo_v2.png"
             alt="NFL Stats Radar Logo"
             width={96}
             height={96}

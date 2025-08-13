@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className={`${inter.className} relative pb-16`}>
         {children}
-        <footer className="fixed bottom-0 left-0 right-0 w-full py-4 text-center bg-gray-800 text-gray-300 shadow-lg">
+        <footer className="fixed bottom-0 left-0 right-0 w-full py-4 text-center text-gray-300 shadow-lg" style={{ backgroundColor: 'var(--brand-primary)' }}>
           <a
             href="https://github.com/nishs9/nfl-stats-radar"
             target="_blank"

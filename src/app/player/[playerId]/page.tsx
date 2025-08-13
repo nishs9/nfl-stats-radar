@@ -107,7 +107,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
       </button>
 
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="bg-gray-800 text-white p-6">
+        <div className="text-white p-6" style={{ backgroundColor: 'var(--brand-primary)' }}>
            <div className="flex flex-col md:flex-row items-center md:items-start">
             <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-6 bg-gray-700">
               <Image 

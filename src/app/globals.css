@@ -5,6 +5,7 @@
 @tailwind utilities;
 
 :root {
+  --brand-primary: #2b3447;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 240, 240, 240;
