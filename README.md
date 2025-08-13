@@ -48,14 +48,6 @@ yarn dev
 
 The application will be available at `http://localhost:3000`
 
-### Development
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
-
 ### Docker Support
 
 The project also includes Docker support for containerized development and deployment:
