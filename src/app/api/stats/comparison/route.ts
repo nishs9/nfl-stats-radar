@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const position = searchParams.get('position');
     const season = parseInt(searchParams.get('season') || '');
     const statType = searchParams.get('statType');
+    const playerId = searchParams.get('playerId');
 
     if (!position || !season || !statType) {
       return NextResponse.json(
@@ -31,25 +32,39 @@ export async function GET(request: Request) {
       );
     }
 
+    const statQualifiers: Record<string, string> = {
+      'QB': "attempts > 150",
+      'RB': "carries > 100",
+      'WR': "receptions > 15",
+      'TE': "receptions > 15"
+    }
+
     // Get the stat definition to find its label
     const statDefinitions = getStatsForPosition(position);
     const statDef = statDefinitions.find(def => def.key === statType);
     const statLabel = statDef?.label || statType; // Fallback to key if label not found
 
-    // Query to get players and their stats for the given position and season
+    const qualifier = statQualifiers[position]
+
+    // Query to get the target player and qualifying players
     const query = `
-      SELECT 
-        player_id,
-        player_display_name,
-        ${statType}
+      SELECT player_id, player_display_name, ${statType}
+      FROM ${tableName}
+      WHERE player_id = ? AND season_type = 'REG'
+      
+      UNION
+      
+      SELECT player_id, player_display_name, ${statType}
       FROM ${tableName}
       WHERE position = ? 
-        AND ${statType} IS NOT NULL
+        AND ${statType} IS NOT NULL 
         AND season_type = 'REG'
+        AND ${qualifier}
+      
       ORDER BY ${statType} DESC
     `;
 
-    const players = await db.all(query, [position]);
+    const players = await db.all(query, [playerId, position]);
 
     return NextResponse.json(
       {

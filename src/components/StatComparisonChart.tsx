@@ -37,7 +37,7 @@ export default function StatComparisonChart({
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `/api/stats/comparison?season=${season}&statType=${statType}&position=${position}`
+          `/api/stats/comparison?season=${season}&statType=${statType}&position=${position}&playerId=${playerId}`
         );
         
         if (!response.ok) {
@@ -52,7 +52,7 @@ export default function StatComparisonChart({
     };
 
     fetchData();
-  }, [season, statType, position]);
+  }, [season, statType, position, playerId]);
 
   useEffect(() => {
     if (!data || !svgRef.current || !tooltipRef.current) return;
