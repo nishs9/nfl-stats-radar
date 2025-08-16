@@ -66,6 +66,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
+      { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: 1.5 * Target Share + 0.7 * Air Yard Share', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
       { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
     ],
@@ -75,7 +76,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
-      { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: Receiving EPA / Receiving Yards', higherIsBetter: true },
+      { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: 1.5 * Target Share + 0.7 * Air Yard Share', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
       { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
     ],
@@ -85,7 +86,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
-      { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: Receiving EPA / Receiving Yards', higherIsBetter: true },
+      { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: 1.5 * Target Share + 0.7 * Air Yard Share', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
       { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
     ]
