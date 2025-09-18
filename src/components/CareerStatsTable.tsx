@@ -36,9 +36,6 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
     );
   }
 
-  // Get the relevant stats for this position
-  const statDefinitions = getStatsForPosition(position);
-  
   // Define which columns to show based on position
   const getColumnsForPosition = (pos: string) => {
     const baseColumns = ['season', 'team'];
