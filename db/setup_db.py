@@ -3,10 +3,14 @@ import sqlite3
 import pandas as pd
 from pathlib import Path
 
-def generate_derived_column_stats(df):
+def generate_derived_column_stats(df, year):
     df['comp_pct'] = (df['completions'] / df['attempts']) * 100
-    df['sack_rate'] = (df['sacks'] / (df['sacks'] + df['attempts'])) * 100
-    df['total_turnovers'] = df['interceptions'] + df['rushing_fumbles_lost'] + df['receiving_fumbles_lost']
+    if year <= 2024:
+        df['sack_rate'] = (df['sacks'] / (df['sacks'] + df['attempts'])) * 100
+        df['total_turnovers'] = df['interceptions'] + df['rushing_fumbles_lost'] + df['receiving_fumbles_lost']
+    else:
+        df['sack_rate'] = (df['sacks_suffered'] / (df['sacks_suffered'] + df['attempts'])) * 100
+        df['total_turnovers'] = df['passing_interceptions'] + df['rushing_fumbles_lost'] + df['receiving_fumbles_lost']
     df['yac%'] = df['receiving_yards_after_catch'] / df['receiving_yards'] * 100
     return df
 
@@ -25,9 +29,10 @@ def create_database():
         
         # Create table name from the CSV filename (without extension)
         table_name = csv_file.stem
+        year = int(table_name.replace("player_stats_season_", "").replace(".csv", ""))
 
         # Generate additional derived columns
-        final_df = generate_derived_column_stats(df)
+        final_df = generate_derived_column_stats(df, year)
         
         # Create the table
         final_df.to_sql(table_name, conn, if_exists='replace', index=False)

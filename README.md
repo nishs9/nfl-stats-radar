@@ -1,6 +1,6 @@
 # NFL Stats Radar
 
-A project for visualizing NFL player statistics. The main feature of this web app is the ability to view the statistical profiles of all QBs, RBs, WRs, and TEs since 1999. The app is built using Next.js and Typescript. The backend consists of a simple SQLite DB that is made up of data from NFLverse's data repository (see References section for more info). I currently have the app deployed using Railway.
+A website for visualizing NFL player statistics. The main feature of this web app is the ability to view the statistical profiles of all QBs, RBs, WRs, and TEs since 1999. The app is built using Next.js and Typescript. The backend consists of a simple SQLite DB that is made up of data from NFLverse's data repository (see References section for more info). I currently have the app deployed using Railway.
 
 **Live Demo**: [https://nfl-stats-radar-production.up.railway.app/](https://nfl-stats-radar-production.up.railway.app/)
 
@@ -13,7 +13,7 @@ A project for visualizing NFL player statistics. The main feature of this web ap
 - Season selection to view stats from any year in a player's career
 
 ## Future Features + Plans
-- Additional types of visualizations along with real-time customizastion
+- Additional types of visualizations along with real-time customization
 - Player radar charts (i.e. something similar to the attribute radar charts in FIFA)
 
 ## Getting Started
