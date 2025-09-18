@@ -137,11 +137,55 @@ export async function GET(
       }
     }
 
+    // TODO: Refine the stats we show in this table
+    // Get career stats for all seasons
+    const careerStatsQuery = `
+      SELECT season, recent_team, 
+             passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate,
+             rushing_epa, rushing_yards, 
+             receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr,
+             total_turnovers, fantasy_points_ppr, games
+      FROM (
+        SELECT 2025 as season, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2025 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2024, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2023, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2022, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2021, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2020, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2020 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2019, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2019 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2018, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2018 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2017, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2017 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2016, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2016 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2015, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2015 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2014, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2014 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2013, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2013 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2012, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2012 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2011, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2011 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2010, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2010 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2009, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2009 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2008, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2008 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2007, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2007 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2006, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2006 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2005, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2005 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2004, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2004 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2003, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2003 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2002, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2002 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2001, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2001 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2000, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_2000 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 1999, recent_team, passing_air_yards, passing_yards, passing_epa, comp_pct, sack_rate, rushing_epa, rushing_yards, receiving_epa, receiving_yards, target_share, air_yards_share, racr, wopr, total_turnovers, fantasy_points_ppr, games FROM player_stats_season_1999 WHERE player_id = ? AND season_type = 'REG'
+      )
+      ORDER BY season DESC
+    `;
+
+    const careerStatsQueryParams = Array(26).fill(playerId);
+    const careerStats = await db.all(careerStatsQuery, careerStatsQueryParams);
+
     return NextResponse.json({
       playerInfo,
       seasons: seasons,
       stats: playerStats,
-      percentiles: percentileStats
+      percentiles: percentileStats,
+      careerStats: careerStats
     });
   } catch (error) {
     console.error('Player fetch error:', error);

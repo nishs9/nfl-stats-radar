@@ -5,15 +5,15 @@ export interface Player {
   position: string;
   recent_team: string;
   headshot_url?: string;
-  season?: number; // Season from playerInfo query (most recent)
+  season?: number;
 }
 
 // Definition for a single statistic category
 export interface StatDefinition {
-  key: string;       // e.g., 'passing_epa'
-  label: string;     // e.g., 'Passing EPA'
-  description?: string; // Optional description
-  higherIsBetter?: boolean; // Optional: true if higher value is better
+  key: string;
+  label: string;
+  description?: string;
+  higherIsBetter?: boolean;
 }
 
 // Player stats (raw values for a season)
@@ -23,7 +23,31 @@ export interface PlayerStats {
 
 // Percentile stats (calculated percentiles for a season)
 export interface PercentileStats {
-  [key: string]: number; // Key matches StatDefinition.key
+  [key: string]: number; 
+}
+
+// Used for stats table on the player profile page
+export interface CareerStats {
+  season: number;
+  recent_team: string;
+  passing_air_yards?: number | null;
+  passing_yards?: number | null;
+  passing_epa?: number | null;
+  comp_pct?: number | null;
+  sack_rate?: number | null;
+  rushing_epa?: number | null;
+  rushing_yards?: number | null;
+  receiving_epa?: number | null;
+  receiving_yards?: number | null;
+  target_share?: number | null;
+  air_yards_share?: number | null;
+  racr?: number | null;
+  wopr?: number | null;
+  total_turnovers?: number | null;
+  fantasy_points_ppr?: number | null;
+  games?: number | null;
+  offensive_snaps?: number | null;
+  defensive_snaps?: number | null;
 }
 
 // API response for player search suggestions
@@ -31,15 +55,16 @@ export interface PlayerSearchResponse {
   player_id: string;
   player_display_name: string;
   recent_team: string;
-  position: string; // Include position in search results
+  position: string; 
 }
 
 // API response for the main player page data
 export interface PlayerDataResponse {
   playerInfo: Player;
-  seasons: number[]; // Array of available seasons
-  stats: PlayerStats | null; // Stats for the selected season
-  percentiles: PercentileStats | null; // Percentiles for the selected season
+  seasons: number[];
+  stats: PlayerStats | null; 
+  percentiles: PercentileStats | null; 
+  careerStats: CareerStats[]; 
 }
 
 // Helper function (can stay here or move to utils)
