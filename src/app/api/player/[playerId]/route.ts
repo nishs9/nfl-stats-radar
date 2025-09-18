@@ -26,7 +26,8 @@ export async function GET(
         SELECT player_id, player_display_name, position, recent_team, headshot_url, season,
                ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY season DESC) as rn
         FROM (
-          SELECT player_id, player_display_name, position, recent_team, headshot_url, 2024 as season FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
+          SELECT player_id, player_display_name, position, recent_team, headshot_url, 2025 as season FROM player_stats_season_2025 WHERE player_id = ? AND season_type = 'REG'
+          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2024 FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
           UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2023 FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
           UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2022 FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
           UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2021 FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
@@ -70,7 +71,8 @@ export async function GET(
     const seasonsQuery = `
       SELECT DISTINCT season
       FROM (
-        SELECT 2024 as season FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
+        SELECT 2025 as season FROM player_stats_season_2025 WHERE player_id = ? AND season_type = 'REG'
+        UNION ALL SELECT 2024 FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
         UNION ALL SELECT 2023 FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
         UNION ALL SELECT 2022 FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
         UNION ALL SELECT 2021 FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
