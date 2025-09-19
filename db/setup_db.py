@@ -11,7 +11,7 @@ def generate_derived_column_stats(df, year):
     else:
         df['sack_rate'] = (df['sacks_suffered'] / (df['sacks_suffered'] + df['attempts'])) * 100
         df['total_turnovers'] = df['passing_interceptions'] + df['rushing_fumbles_lost'] + df['receiving_fumbles_lost']
-    df['yac%'] = df['receiving_yards_after_catch'] / df['receiving_yards'] * 100
+    df['yac_pct'] = df['receiving_yards_after_catch'] / df['receiving_yards'] * 100
     return df
 
 def create_database():

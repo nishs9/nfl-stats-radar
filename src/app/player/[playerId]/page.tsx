@@ -4,6 +4,7 @@ import React, { use, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PlayerDataResponse, getStatsForPosition } from '@/types/player'; 
 import PercentileSlider from '@/components/PercentileSlider';
+import CareerStatsTable from '@/components/CareerStatsTable';
 import Image from 'next/image';
 
 // Try using PageProps directly
@@ -93,7 +94,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     );
   }
 
-  const { playerInfo, seasons, stats, percentiles } = playerData;
+  const { playerInfo, seasons, stats, percentiles, careerStats } = playerData;
   const statDefinitions = getStatsForPosition(playerInfo.position); 
   const fallbackSrc = getDefaultImageUrl();
 
@@ -166,6 +167,21 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
               })}
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-8">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-6">Career Statistics</h2>
+          <div className="overflow-x-auto">
+            <CareerStatsTable 
+              careerStats={careerStats || []} 
+              position={playerInfo.position} 
+            />
+          </div>
+          <div className="mt-4 text-xs text-gray-500 text-center md:hidden">
+            Scroll horizontally to view all columns
+          </div>
         </div>
       </div>
     </div>
