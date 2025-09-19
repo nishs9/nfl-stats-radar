@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDbConnection } from '@/lib/db';
-import { PlayerStats } from '@/types/player'; // Make sure PlayerStats is imported
+import { PlayerStats } from '@/types/player';
 
 // Correct the type definition for the second argument using destructuring
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ playerId: string }> } // Destructure params directly
+  { params }: { params: Promise<{ playerId: string }> }
 ) {
   try {
     // Access playerId directly via the destructured params
@@ -20,92 +20,40 @@ export async function GET(
 
     const db = await getDbConnection();
 
-    // First get the player's basic info from the most recent season they played
-    const playerInfoQuery = `
-      WITH PlayerSeasons AS (
-        SELECT player_id, player_display_name, position, recent_team, headshot_url, season,
-               ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY season DESC) as rn
-        FROM (
-          SELECT player_id, player_display_name, position, recent_team, headshot_url, 2025 as season FROM player_stats_season_2025 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2024 FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2023 FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2022 FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2021 FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2020 FROM player_stats_season_2020 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2019 FROM player_stats_season_2019 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2018 FROM player_stats_season_2018 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2017 FROM player_stats_season_2017 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2016 FROM player_stats_season_2016 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2015 FROM player_stats_season_2015 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2014 FROM player_stats_season_2014 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2013 FROM player_stats_season_2013 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2012 FROM player_stats_season_2012 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2011 FROM player_stats_season_2011 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2010 FROM player_stats_season_2010 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2009 FROM player_stats_season_2009 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2008 FROM player_stats_season_2008 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2007 FROM player_stats_season_2007 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2006 FROM player_stats_season_2006 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2005 FROM player_stats_season_2005 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2004 FROM player_stats_season_2004 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2003 FROM player_stats_season_2003 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2002 FROM player_stats_season_2002 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2001 FROM player_stats_season_2001 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 2000 FROM player_stats_season_2000 WHERE player_id = ? AND season_type = 'REG'
-          UNION ALL SELECT player_id, player_display_name, position, recent_team, headshot_url, 1999 FROM player_stats_season_1999 WHERE player_id = ? AND season_type = 'REG'
-        )
-      )
-      SELECT player_id, player_display_name, position, recent_team, headshot_url, season
-      FROM PlayerSeasons
-      WHERE rn = 1
-    `;
+    const years = Array.from({ length: 2025 - 1999 + 1 }, (_, i) => 2025 - i);
 
-    const queryParams = Array(26).fill(playerId); // Adjusted array size based on query
+    const playerInfoUnionQueries = years
+      .map(
+        (year) =>
+          `SELECT player_id, player_display_name, position, recent_team, headshot_url, ${year} as season 
+            FROM player_stats_season_${year} WHERE player_id = ? AND season_type = 'REG'`
+      )
+      .join('\nUNION ALL ');
+    const playerInfoQuery = `
+      SELECT player_id, player_display_name, position, recent_team, headshot_url, season,
+              ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY season DESC) as rn 
+        FROM (${playerInfoUnionQueries}) ORDER BY season DESC`;
+
+    const queryParams = Array(years.length).fill(playerId);
     const playerInfo = await db.get(playerInfoQuery, queryParams);
 
     if (!playerInfo) {
       return NextResponse.json({ error: 'Player not found' }, { status: 404 });
     }
 
-    // Get all seasons this player has played
-    const seasonsQuery = `
-      SELECT DISTINCT season
-      FROM (
-        SELECT 2025 as season FROM player_stats_season_2025 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2024 FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2023 FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2022 FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2021 FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2020 FROM player_stats_season_2020 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2019 FROM player_stats_season_2019 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2018 FROM player_stats_season_2018 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2017 FROM player_stats_season_2017 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2016 FROM player_stats_season_2016 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2015 FROM player_stats_season_2015 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2014 FROM player_stats_season_2014 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2013 FROM player_stats_season_2013 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2012 FROM player_stats_season_2012 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2011 FROM player_stats_season_2011 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2010 FROM player_stats_season_2010 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2009 FROM player_stats_season_2009 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2008 FROM player_stats_season_2008 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2007 FROM player_stats_season_2007 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2006 FROM player_stats_season_2006 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2005 FROM player_stats_season_2005 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2004 FROM player_stats_season_2004 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2003 FROM player_stats_season_2003 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2002 FROM player_stats_season_2002 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2001 FROM player_stats_season_2001 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 2000 FROM player_stats_season_2000 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT 1999 FROM player_stats_season_1999 WHERE player_id = ? AND season_type = 'REG'
+    const seasonsUnionQueries = years
+      .map(
+        (year) =>
+          `SELECT ${year} as season FROM player_stats_season_${year} WHERE player_id = ? AND season_type = 'REG'`
       )
-      ORDER BY season DESC
-    `;
+      .join('\nUNION ALL ');
+    const seasonsQuery = `
+      SELECT DISTINCT season FROM (${seasonsUnionQueries}) ORDER BY season DESC`;
     
     // Ensure queryParams has the correct length for the seasons query as well
-    const seasonsQueryParams = Array(26).fill(playerId); 
+    const seasonsQueryParams = Array(years.length).fill(playerId); 
     const seasonsResult = await db.all(seasonsQuery, seasonsQueryParams);
-    const seasons = seasonsResult.map((s: { season: number }) => s.season); // Extract season numbers
+    const seasons = seasonsResult.map((s: { season: number }) => s.season);
 
     // Default to the most recent season if not specified
     const targetSeason = season || (seasons.length > 0 ? seasons[0] : null);
@@ -142,42 +90,17 @@ export async function GET(
       'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'receptions', 'receiving_tds', 'receiving_yards_after_catch', 
       'carries', 'rushing_tds', 'yac_pct'];
 
-    // TODO: Refine the stats we show in this table
     // Get career stats for all seasons
-    const careerStatsQuery = `
-      SELECT ${columnsToQuery.join(', ')} FROM (
-        SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2025 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2024 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2023 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2022 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2021 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2020 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2019 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2018 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2017 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2016 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2015 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2014 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2013 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2012 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2011 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2010 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2009 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2008 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2007 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2006 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2005 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2004 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2003 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2002 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2001 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_2000 WHERE player_id = ? AND season_type = 'REG'
-        UNION ALL SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_1999 WHERE player_id = ? AND season_type = 'REG'
+    const careerStatsUnionQueries = years
+      .map(
+        (year) =>
+          `SELECT ${columnsToQuery.join(', ')} FROM player_stats_season_${year} WHERE player_id = ? AND season_type = 'REG'`
       )
-      ORDER BY season DESC
-    `;
+      .join('\nUNION ALL ');
+    const careerStatsQuery = `
+      SELECT ${columnsToQuery.join(', ')} FROM (${careerStatsUnionQueries}) ORDER BY season DESC`;
 
-    const careerStatsQueryParams = Array(26).fill(playerId);
+    const careerStatsQueryParams = Array(years.length).fill(playerId);
     const careerStats = await db.all(careerStatsQuery, careerStatsQueryParams);
 
     return NextResponse.json({
