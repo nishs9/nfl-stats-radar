@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CareerStats, getStatsForPosition } from '@/types/player';
+import { CareerStats } from '@/types/player';
 
 interface CareerStatsTableProps {
   careerStats: CareerStats[];
@@ -24,7 +24,13 @@ function formatNumber(value: number | null | undefined): string {
 // Helper function to format percentages
 function formatPercentage(value: number | null | undefined): string {
   if (value === null || value === undefined) return '-';
-  return `${(value * 100).toFixed(1)}%`;
+  // If the value is already a percentage (like 66.849), just format it
+  // If it's a decimal (like 0.66849), multiply by 100
+  if (value > 1) {
+    return `${value.toFixed(1)}%`;
+  } else {
+    return `${(value * 100).toFixed(1)}%`;
+  }
 }
 
 export default function CareerStatsTable({ careerStats, position }: CareerStatsTableProps) {
@@ -38,16 +44,17 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
 
   // Define which columns to show based on position
   const getColumnsForPosition = (pos: string) => {
-    const baseColumns = ['season', 'team'];
+    const baseColumns = ['season', 'team', 'games'];
     
     switch (pos) {
       case 'QB':
-        return [...baseColumns, 'passing_yards', 'passing_epa', 'comp_pct', 'rushing_yards', 'fantasy_points_ppr'];
+        return [...baseColumns, 'completions', 'attempts', 'comp_pct', 'passing_yards', 'passing_air_yards', 'passing_tds', 'passing_epa', 'carries', 'rushing_yards', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
       case 'RB':
-        return [...baseColumns, 'rushing_yards', 'receiving_yards', 'target_share', 'fantasy_points_ppr'];
+        return [...baseColumns, 'carries', 'rushing_yards', 'rushing_tds', 'rushing_epa', 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'receiving_tds', 'receiving_epa', 'target_share', 'fantasy_points_ppr'];
       case 'WR':
+        return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'carries', 'rushing_yards', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
       case 'TE':
-        return [...baseColumns, 'receiving_yards', 'target_share', 'racr', 'fantasy_points_ppr'];
+        return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'carries', 'rushing_yards', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
       default:
         return [...baseColumns, 'games', 'fantasy_points_ppr'];
     }
@@ -65,9 +72,21 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
     rushing_yards: 'Rush Yds',
     receiving_yards: 'Rec Yds',
     target_share: 'Target %',
+    air_yards_share: 'Air Yds %',
+    yac_pct: 'YAC %',
     racr: 'RACR',
     fantasy_points_ppr: 'FP (PPR)',
-    games: 'Games'
+    games: 'Games',
+    completions: 'Comps',
+    attempts: 'Att',
+    passing_air_yards: 'Air Yds',
+    passing_tds: 'Pass TDs',
+    rushing_tds: 'Rush TDs',
+    receiving_tds: 'Rec TDs',
+    receiving_yards_after_catch: 'YAC',
+    receiving_epa: 'Rec EPA',
+    rushing_epa: 'Rush EPA',
+    receptions: 'Catches',
   };
 
   // Render cell content based on column type
@@ -80,6 +99,7 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
       case 'team':
         return stat.recent_team;
       case 'comp_pct':
+        return formatPercentage(value as number);
       case 'target_share':
         return formatPercentage(value as number);
       default:
@@ -88,8 +108,7 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+    <table className="w-full bg-white border border-gray-200 rounded-lg shadow-sm" style={{ minWidth: '800px' }}>
         <thead className="bg-gray-50">
           <tr>
             {columns.map((column) => (
@@ -117,11 +136,5 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
           ))}
         </tbody>
       </table>
-      
-      {/* Mobile-friendly note */}
-      <div className="mt-4 text-xs text-gray-500 text-center md:hidden">
-        Scroll horizontally to view all columns
-      </div>
-    </div>
   );
 }

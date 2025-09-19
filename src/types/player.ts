@@ -30,15 +30,23 @@ export interface PercentileStats {
 export interface CareerStats {
   season: number;
   recent_team: string;
-  passing_air_yards?: number | null;
+  completions?: number | null;
+  attempts?: number | null;
   passing_yards?: number | null;
+  passing_air_yards?: number | null;
   passing_epa?: number | null;
+  passing_tds?: number | null;
   comp_pct?: number | null;
   sack_rate?: number | null;
+  carries?: number | null;
   rushing_epa?: number | null;
   rushing_yards?: number | null;
+  rushing_tds?: number | null;
+  receptions?: number | null;
   receiving_epa?: number | null;
   receiving_yards?: number | null;
+  receiving_tds?: number | null;
+  receiving_yards_after_catch?: number | null;
   target_share?: number | null;
   air_yards_share?: number | null;
   racr?: number | null;
@@ -46,8 +54,7 @@ export interface CareerStats {
   total_turnovers?: number | null;
   fantasy_points_ppr?: number | null;
   games?: number | null;
-  offensive_snaps?: number | null;
-  defensive_snaps?: number | null;
+  yac_pct?: number | null;
 }
 
 // API response for player search suggestions
@@ -88,6 +95,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'rushing_yards', label: 'Rushing Yards', description: 'Total rushing yards', higherIsBetter: true },
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
+      { key: 'yac_pct', label: 'YAC %', description: 'Percentage of total receiving yards that came after the catch', higherIsBetter: true },
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
@@ -98,6 +106,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
     'WR': [
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
+      { key: 'yac_pct', label: 'YAC %', description: 'Percentage of total receiving yards that came after the catch', higherIsBetter: true },
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
@@ -108,6 +117,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
     'TE': [
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
+      { key: 'yac_pct', label: 'YAC %', description: 'Percentage of total receiving yards that came after the catch', higherIsBetter: true },
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
