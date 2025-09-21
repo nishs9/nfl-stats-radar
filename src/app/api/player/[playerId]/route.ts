@@ -64,7 +64,7 @@ export async function GET(
         playerInfo,
         seasons: seasons,
         stats: null,
-        percentiles: null // Ensure percentiles is also null
+        percentiles: null
       });
     }
 
@@ -118,12 +118,11 @@ export async function GET(
 
 // Helper function to define which stats to show for each position
 function getStatsForPosition(position: string): string[] {
-  // This is a placeholder - you'll need to customize these for each position
   const positionStats: Record<string, string[]> = {
-    'QB': ['passing_air_yards', 'passing_yards', 'passing_epa', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'pacr', 'total_turnovers', 'fantasy_points_ppr'],
-    'RB': ['rushing_epa', 'rushing_yards', 'receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct'],
-    'WR': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct'],
-    'TE': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct']
+    'QB': ['passing_air_yards', 'passing_yards', 'passing_epa', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'pacr', 'total_turnovers', 'fantasy_points_ppr', 'passing_adot', 'epa_per_play'],
+    'RB': ['rushing_epa', 'rushing_yards', 'receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot'],
+    'WR': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot'],
+    'TE': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot']
   };
 
   return positionStats[position] || ['games', 'offensive_snaps', 'defensive_snaps'];
@@ -131,8 +130,8 @@ function getStatsForPosition(position: string): string[] {
 
 // Helper function to calculate percentiles
 async function calculatePercentiles(
-  db: unknown, // Use unknown instead of any
-  playerStats: PlayerStats, // Use the defined PlayerStats type
+  db: unknown,
+  playerStats: PlayerStats,
   position: string, 
   season: number, 
   statsToCalculate: string[]
