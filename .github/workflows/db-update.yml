@@ -2,13 +2,13 @@ name: Database Script Update
 
 on:
   schedule:
-    - cron: '0 12 * 8-12 3'
-    - cron: '0 12 * 1-2 3' 
+    - cron: '0 6 * 8-12 3'
+    - cron: '0 6 * 1-2 3' 
   workflow_dispatch:
 
 jobs:
   update-database:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
