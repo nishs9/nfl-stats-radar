@@ -2,13 +2,13 @@ name: Database Script Update
 
 on:
   schedule:
-    - cron: '0 6 * 8-12 3'
-    - cron: '0 6 * 1-2 3' 
+    - cron: '0 12 * 8-12 3'
+    - cron: '0 12 * 1-2 3' 
   workflow_dispatch:
 
 jobs:
   update-database:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
     - name: Checkout repository
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.7'
         cache: 'pip'
     
     - name: Install Python dependencies
