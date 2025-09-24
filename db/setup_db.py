@@ -14,7 +14,6 @@ def generate_derived_column_stats(df, year):
     df['yac_pct'] = df['receiving_yards_after_catch'] / df['receiving_yards'] * 100
     df['passing_adot'] = df['passing_air_yards'] / df['attempts']
     df['receiving_adot'] = df['receiving_air_yards'] / df['targets']
-    df['epa_per_play']  = (df['passing_epa'] + df['rushing_epa'] + df['receiving_epa']) / (df['attempts'] + df['carries'] + df['targets'])
     return df
 
 def create_database():

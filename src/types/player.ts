@@ -82,15 +82,14 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'passing_epa', label: 'Passing EPA', description: 'The total expected points added by the QB on pass plays', higherIsBetter: true },
       { key: 'passing_yards', label: 'Passing Yards', description: 'Total passing yards on completions', higherIsBetter: true },
       { key: 'passing_air_yards', label: 'Air Yards', description: 'Total air yards on all passing attempts', higherIsBetter: true },
+      { key: 'passing_adot', label: 'ADOT', description: 'Average Depth of Target: Passing Air Yards / Attempts', higherIsBetter: true },
       { key: 'comp_pct', label: 'Completion %', description: 'Percentage of passes completed', higherIsBetter: true },
       { key: 'sack_rate', label: 'Sack Rate', description: 'Percentage of dropbacks where the QB was sacked', higherIsBetter: false },
       { key: 'rushing_epa', label: 'Rushing EPA', description: 'The total expected points added on rushing plays', higherIsBetter: true },
       { key: 'rushing_yards', label: 'Rushing Yards', description: 'Total rushing yards on carries', higherIsBetter: true },
-      { key: 'epa_per_play', label: 'EPA/Play', description: 'Expected points added per play', higherIsBetter: true },
       { key: 'pacr', label: 'PACR', description: 'Passing Air Conversion Ratio: Passing Yards / Air Yards', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
-      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true },
-      { key: 'passing_adot', label: 'ADOT', description: 'Average Depth of Target: Passing Air Yards / Attempts', higherIsBetter: true }
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
     ],
     'RB': [
       { key: 'rushing_epa', label: 'Rushing EPA', description: 'The total expected points added on rushing plays', higherIsBetter: true },

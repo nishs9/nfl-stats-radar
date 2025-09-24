@@ -148,7 +148,7 @@ export default function StatComparisonChart({
           .style('visibility', 'visible')
           .html(`
             <div class="font-bold">${d.name}</div>
-            <div>${statType}: ${d.value.toFixed(1)}</div>
+            <div>${statType}: ${d.value.toFixed(3)}</div>
             <div class="text-xs text-gray-300 mt-1">Click to view player's stat profile</div>
           `);
         
