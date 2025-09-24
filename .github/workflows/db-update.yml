@@ -1,7 +1,6 @@
 name: Database Script Update
 
 on:
-  # Runs every Wednesday at 6 AM for August-February
   schedule:
     - cron: '0 6 * 8-12 3'
     - cron: '0 6 * 1-2 3' 
@@ -22,7 +21,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.7'
-        cache: 'pip'  # Cache pip dependencies if you have requirements.txt
+        cache: 'pip'
     
     - name: Install Python dependencies
       run: |
@@ -72,12 +71,18 @@ jobs:
           git status
         fi
     
+    - name: Set date environment variables
+      if: steps.check_changes.outputs.has_changes == 'true'
+      run: |
+        echo "CURRENT_DATE=$(date '+%Y-%m-%d')" >> $GITHUB_ENV
+        echo "CURRENT_DATETIME=$(date '+%Y-%m-%d at %H:%M:%S UTC')" >> $GITHUB_ENV
+    
     - name: Commit and push changes
       if: steps.check_changes.outputs.has_changes == 'true'
       run: |
         echo "Committing changes..."
         git add .
-        git commit -m "Database update - $(date '+%Y-%m-%d %H:%M:%S')"
+        git commit -m "Database update - ${{ env.CURRENT_DATE }}"
         git push origin ${{ steps.branch.outputs.branch_name }}
         echo "Changes committed and pushed successfully"
     
@@ -88,11 +93,11 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ steps.branch.outputs.branch_name }}
         base: main
-        title: "Database Update - $(date '+%Y-%m-%d')"
+        title: "Database Update - ${{ env.CURRENT_DATE }}"
         body: |
           ## Database Update
           
-          This PR contains automated database updates generated on $(date '+%Y-%m-%d at %H:%M:%S UTC').
+          This PR contains automated database updates generated on ${{ env.CURRENT_DATETIME }}.
           
           ### Changes
           - Database script executed successfully
@@ -107,30 +112,24 @@ jobs:
       run: |
         echo "No changes were made by the database script, skipping PR creation"
     
-    # Error handling and cleanup
     - name: Cleanup on failure
       if: failure()
       run: |
         echo "Workflow failed, starting cleanup..."
         
-        # Get current branch
         CURRENT_BRANCH=$(git branch --show-current)
         echo "Current branch: $CURRENT_BRANCH"
         
-        # Switch back to main if we're not already there
         if [ "$CURRENT_BRANCH" != "main" ]; then
           echo "Switching back to main branch..."
           git checkout main || echo "Warning: Could not switch to main branch"
         fi
         
-        # Delete the temp branch if it exists
         if [ -n "${{ steps.branch.outputs.branch_name }}" ]; then
           echo "Attempting to delete temp branch: ${{ steps.branch.outputs.branch_name }}"
           
-          # Delete local branch
           git branch -D ${{ steps.branch.outputs.branch_name }} 2>/dev/null || echo "Local branch not found or already deleted"
           
-          # Delete remote branch
           git push origin --delete ${{ steps.branch.outputs.branch_name }} 2>/dev/null || echo "Remote branch not found or already deleted"
         fi
         
@@ -154,5 +153,4 @@ jobs:
         echo ""
         echo "Full logs available at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         
-        # Exit with failure
         exit 1
