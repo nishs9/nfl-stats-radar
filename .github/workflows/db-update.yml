@@ -38,7 +38,6 @@ jobs:
         git config --global user.name "GitHub Action"
     
     - name: Generate unique branch name
-      working-directory: ./repo
       id: branch
       run: |
         BRANCH_NAME="db-update-$(date +%Y%m%d-%H%M%S)"
@@ -46,7 +45,6 @@ jobs:
         echo "Generated branch name: $BRANCH_NAME"
     
     - name: Create and checkout temp branch
-      working-directory: ./repo
       id: create_branch
       run: |
         echo "Creating temp branch: ${{ steps.branch.outputs.branch_name }}"
@@ -55,7 +53,6 @@ jobs:
         echo "Temporary DB update branch created and pushed successfully"
     
     - name: Execute database script
-      working-directory: ./repo
       id: db_script
       run: |
         echo "Executing database update script..."
@@ -63,7 +60,6 @@ jobs:
         echo "Database script executed successfully"
     
     - name: Check for file changes
-      working-directory: ./repo
       id: check_changes
       run: |
         if git diff --quiet && git diff --cached --quiet; then
@@ -82,7 +78,6 @@ jobs:
         echo "CURRENT_DATETIME=$(date '+%Y-%m-%d at %H:%M:%S UTC')" >> $GITHUB_ENV
     
     - name: Commit and push changes
-      working-directory: ./repo
       if: steps.check_changes.outputs.has_changes == 'true'
       run: |
         echo "Committing changes..."
@@ -118,7 +113,6 @@ jobs:
         echo "No changes were made by the database script, skipping PR creation"
     
     - name: Cleanup on failure
-      working-directory: ./repo
       if: failure()
       run: |
         echo "Workflow failed, starting cleanup..."
