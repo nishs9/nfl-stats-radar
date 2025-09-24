@@ -3,7 +3,7 @@ name: Database Script Update
 on:
   # Runs every Wednesday at 6 AM for August-February
   schedule:
-    - cron: '0 6 * 8-2 3'  # 
+    - cron: '0 6 * 8,9,10,11,12,1,2 3'
   workflow_dispatch:
 
 jobs:
