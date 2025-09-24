@@ -82,6 +82,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'passing_epa', label: 'Passing EPA', description: 'The total expected points added by the QB on pass plays', higherIsBetter: true },
       { key: 'passing_yards', label: 'Passing Yards', description: 'Total passing yards on completions', higherIsBetter: true },
       { key: 'passing_air_yards', label: 'Air Yards', description: 'Total air yards on all passing attempts', higherIsBetter: true },
+      { key: 'passing_adot', label: 'ADOT', description: 'Average Depth of Target: Passing Air Yards / Attempts', higherIsBetter: true },
       { key: 'comp_pct', label: 'Completion %', description: 'Percentage of passes completed', higherIsBetter: true },
       { key: 'sack_rate', label: 'Sack Rate', description: 'Percentage of dropbacks where the QB was sacked', higherIsBetter: false },
       { key: 'rushing_epa', label: 'Rushing EPA', description: 'The total expected points added on rushing plays', higherIsBetter: true },
@@ -96,9 +97,8 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
       { key: 'yac_pct', label: 'YAC %', description: 'Percentage of total receiving yards that came after the catch', higherIsBetter: true },
-      { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
-      { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
       { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
+      { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: 1.5 * Target Share + 0.7 * Air Yard Share', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
       { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
@@ -107,23 +107,25 @@ export function getStatsForPosition(position: string): StatDefinition[] {
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
       { key: 'yac_pct', label: 'YAC %', description: 'Percentage of total receiving yards that came after the catch', higherIsBetter: true },
+      { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
-      { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
       { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: 1.5 * Target Share + 0.7 * Air Yard Share', higherIsBetter: true },
+      { key: 'receiving_adot', label: 'ADOT', description: 'Average Depth of Target: Receiving Air Yards / Targets', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
-      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true },
     ],
     'TE': [
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
       { key: 'yac_pct', label: 'YAC %', description: 'Percentage of total receiving yards that came after the catch', higherIsBetter: true },
+      { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
       { key: 'target_share', label: 'Target Share', description: 'Percentage share of team targets', higherIsBetter: true },
       { key: 'air_yards_share', label: 'Air Yards Share', description: 'Percentage share of team air yards', higherIsBetter: true },
-      { key: 'racr', label: 'RACR', description: 'Receiving Air Conversion Ratio: Receiving Yards / Air Yards', higherIsBetter: true },
       { key: 'wopr', label: 'WOPR', description: 'Weighted Opportunity Rate: 1.5 * Target Share + 0.7 * Air Yard Share', higherIsBetter: true },
+      { key: 'receiving_adot', label: 'ADOT', description: 'Average Depth of Target: Receiving Air Yards / Targets', higherIsBetter: true },
       { key: 'total_turnovers', label: 'Total Turnovers', description: 'Total turnovers', higherIsBetter: false },
-      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true }
+      { key: 'fantasy_points_ppr', label: 'Fantasy Points (PPR)', description: 'Fantasy points per game in PPR scoring', higherIsBetter: true },
     ]
   };
 
