@@ -73,3 +73,6 @@ Desktop.ini
 
 # Ignore data files
 player_stats_season_*.csv
+
+venv/
+
