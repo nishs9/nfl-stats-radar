@@ -120,7 +120,7 @@ export async function GET(
 function getStatsForPosition(position: string): string[] {
   const positionStats: Record<string, string[]> = {
     'QB': ['passing_air_yards', 'passing_yards', 'passing_adot', 'passing_epa', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'pacr', 'total_turnovers', 'fantasy_points_ppr'],
-    'RB': ['rushing_epa', 'rushing_yards', 'yards_per_carry', 'receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'wopr', 'total_turnovers', 'fantasy_points_ppr'],
+    'RB': ['rushing_epa', 'rushing_yards', 'carries', 'yards_per_carry', 'receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'wopr', 'total_turnovers', 'fantasy_points_ppr'],
     'WR': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot'],
     'TE': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot']
   };
