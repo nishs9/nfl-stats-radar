@@ -14,6 +14,10 @@ def generate_derived_column_stats(df, year):
     df['yac_pct'] = df['receiving_yards_after_catch'] / df['receiving_yards'] * 100
     df['passing_adot'] = df['passing_air_yards'] / df['attempts']
     df['receiving_adot'] = df['receiving_air_yards'] / df['targets']
+    df['yards_per_carry'] = df['rushing_yards'] / df['carries']
+    df['yards_per_target'] = df['receiving_yards'] / df['targets']
+    if year >= 2025:
+        df['interceptions'] = df['passing_interceptions']
     return df
 
 def get_player_stats_data():
