@@ -94,7 +94,7 @@ export function getStatsForPosition(position: string): StatDefinition[] {
     'RB': [
       { key: 'rushing_epa', label: 'Rushing EPA', description: 'The total expected points added on rushing plays', higherIsBetter: true },
       { key: 'rushing_yards', label: 'Rushing Yards', description: 'Total rushing yards', higherIsBetter: true },
-      { key: 'carries', label: 'RACR', description: 'Total number of rushing attempts', higherIsBetter: true },
+      { key: 'carries', label: 'Carries', description: 'Total number of rushing attempts', higherIsBetter: true },
       { key: 'yards_per_carry', label: 'Yards Per Carry', description: 'Average rushing yards per rushing attempt', higherIsBetter: true },
       { key: 'receiving_epa', label: 'Receiving EPA', description: 'The total expected points added by the receiver on pass plays', higherIsBetter: true },
       { key: 'receiving_yards', label: 'Receiving Yards', description: 'Total receiving yards', higherIsBetter: true },
