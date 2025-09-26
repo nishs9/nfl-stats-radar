@@ -88,7 +88,6 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
     rushing_epa: 'Rush EPA',
     receptions: 'Catches',
     interceptions: 'Ints',
-    passing_interceptions: 'Ints',
     yards_per_carry: 'Yds/Carry',
     yards_per_target: 'Yds/Tgt',
   };
