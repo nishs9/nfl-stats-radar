@@ -88,7 +88,7 @@ export async function GET(
     const columnsToQuery = ['season', 'recent_team', 'games', 'completions', 'attempts', 'passing_air_yards', 'passing_yards', 
       'passing_epa', 'passing_tds', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'receiving_epa', 'receiving_yards', 'target_share', 
       'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'receptions', 'receiving_tds', 'receiving_yards_after_catch', 
-      'carries', 'rushing_tds', 'yac_pct'];
+      'carries', 'rushing_tds', 'yac_pct', 'yards_per_carry', 'yards_per_target', 'interceptions'];
 
     // Get career stats for all seasons
     const careerStatsUnionQueries = years
@@ -120,7 +120,7 @@ export async function GET(
 function getStatsForPosition(position: string): string[] {
   const positionStats: Record<string, string[]> = {
     'QB': ['passing_air_yards', 'passing_yards', 'passing_adot', 'passing_epa', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'pacr', 'total_turnovers', 'fantasy_points_ppr'],
-    'RB': ['rushing_epa', 'rushing_yards', 'receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot'],
+    'RB': ['rushing_epa', 'rushing_yards', 'yards_per_carry', 'receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'wopr', 'total_turnovers', 'fantasy_points_ppr'],
     'WR': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot'],
     'TE': ['receiving_epa', 'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 'fantasy_points_ppr', 'yac_pct', 'receiving_adot']
   };
