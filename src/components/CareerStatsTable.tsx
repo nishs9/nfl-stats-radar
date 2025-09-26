@@ -54,7 +54,7 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
       case 'WR':
         return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
       case 'TE':
-        return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
+        return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'fantasy_points_ppr'];
       default:
         return [...baseColumns, 'games', 'fantasy_points_ppr'];
     }
