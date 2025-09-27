@@ -1,5 +1,6 @@
 import PlayerSearch from '@/components/PlayerSearch';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -25,6 +26,16 @@ export default function Home() {
       <div className="flex flex-col items-center justify-start flex-1 py-12 px-4">
         <div className="w-full max-w-md mx-auto">
           <PlayerSearch />
+          
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 mb-4">Or</p>
+            <Link 
+              href="/compare"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center transition-colors"
+            >
+              Compare Players
+            </Link>
+          </div>
         </div>
       </div>
     </div>

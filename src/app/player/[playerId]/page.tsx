@@ -100,12 +100,20 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
 
   return ( /* ... component JSX ... */ 
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <button 
-        className="mb-8 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
-        onClick={() => router.push('/')}
-      >
-        ← Back to Search
-      </button>
+      <div className="mb-8 flex gap-4">
+        <button 
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+          onClick={() => router.push('/')}
+        >
+          ← Back to Search
+        </button>
+        <button 
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-flex items-center"
+          onClick={() => router.push(`/compare/${playerId}`)}
+        >
+          Compare Player
+        </button>
+      </div>
 
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="text-white p-6" style={{ backgroundColor: 'var(--brand-primary)' }}>

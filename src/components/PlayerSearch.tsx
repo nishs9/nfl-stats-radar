@@ -11,7 +11,12 @@ type Player = {
   position: string;
 };
 
-export default function PlayerSearch() {
+interface PlayerSearchProps {
+  onPlayerSelect?: (player: Player) => void;
+  placeholder?: string;
+}
+
+export default function PlayerSearch({ onPlayerSelect, placeholder = "Search for a player..." }: PlayerSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +76,14 @@ export default function PlayerSearch() {
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (results.length > 0) {
-      router.push(`/player/${results[0].player_id}`);
+      if (onPlayerSelect) {
+        // In comparison mode, select the first result
+        onPlayerSelect(results[0]);
+        setShowResults(false);
+      } else {
+        // In normal mode, navigate to player profile
+        router.push(`/player/${results[0].player_id}`);
+      }
     }
   }
 
@@ -81,7 +93,7 @@ export default function PlayerSearch() {
         <input
           type="text"
           className="w-full p-3 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Search for a player..."
+          placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.length >= 2 && setShowResults(true)}
@@ -108,16 +120,31 @@ export default function PlayerSearch() {
             <ul>
               {results.map((player) => (
                 <li key={player.player_id} className="border-b last:border-b-0">
-                  <Link 
-                    href={`/player/${player.player_id}`}
-                    className="block p-3 hover:bg-gray-100"
-                    onClick={() => setShowResults(false)}
-                  >
-                    <div className="font-medium">{player.player_display_name}</div>
-                    <div className="text-sm text-gray-500">
-                      {player.position} • {player.recent_team}
-                    </div>
-                  </Link>
+                  {onPlayerSelect ? (
+                    <button
+                      className="block w-full text-left p-3 hover:bg-gray-100"
+                      onClick={() => {
+                        onPlayerSelect(player);
+                        setShowResults(false);
+                      }}
+                    >
+                      <div className="font-medium">{player.player_display_name}</div>
+                      <div className="text-sm text-gray-500">
+                        {player.position} • {player.recent_team}
+                      </div>
+                    </button>
+                  ) : (
+                    <Link 
+                      href={`/player/${player.player_id}`}
+                      className="block p-3 hover:bg-gray-100"
+                      onClick={() => setShowResults(false)}
+                    >
+                      <div className="font-medium">{player.player_display_name}</div>
+                      <div className="text-sm text-gray-500">
+                        {player.position} • {player.recent_team}
+                      </div>
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
