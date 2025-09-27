@@ -16,7 +16,7 @@ interface PlayerSearchProps {
   placeholder?: string;
 }
 
-export default function PlayerSearch({ onPlayerSelect, placeholder = "Search for a player..." }: PlayerSearchProps = {}) {
+export default function PlayerSearch({ onPlayerSelect, placeholder = "Search for a player..." }: PlayerSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(false);
