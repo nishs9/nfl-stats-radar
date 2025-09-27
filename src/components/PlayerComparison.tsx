@@ -34,101 +34,91 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   
   const router = useRouter();
 
-  // Fetch initial left player data if provided
-  useEffect(() => {
-    async function fetchInitialLeftPlayerData() {
-      if (!initialLeftPlayer) return;
-
+  // Reusable function to fetch player data
+  const fetchPlayerData = async (
+    playerId: string,
+    season: number | null,
+    setPlayerData: (data: PlayerDataResponse | null) => void,
+    setImageError: (error: boolean) => void,
+    setSelectedSeason: (season: number) => void,
+    isInitial = false
+  ) => {
+    if (isInitial) {
       setIsLoading(true);
-      setLeftImageError(false);
-      try {
-        const seasonParam = leftSelectedSeason ? `?season=${leftSelectedSeason}` : '';
-        const response = await fetch(`/api/player/${initialLeftPlayer.playerId}${seasonParam}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch player data');
-        }
-        
-        const data: PlayerDataResponse = await response.json();
-        setLeftPlayerData(data);
-        
-        // Set default season if none specified
-        if (leftSelectedSeason === null && data.seasons && data.seasons.length > 0) {
-          setLeftSelectedSeason(data.seasons[0]);
-        }
-      } catch (err) {
+    }
+    setImageError(false);
+    
+    try {
+      const seasonParam = season ? `?season=${season}` : '';
+      const response = await fetch(`/api/player/${playerId}${seasonParam}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch player data');
+      }
+      
+      const data: PlayerDataResponse = await response.json();
+      setPlayerData(data);
+      
+      // Set default season if none specified
+      if (season === null && data.seasons && data.seasons.length > 0) {
+        setSelectedSeason(data.seasons[0]);
+      }
+    } catch (err) {
+      if (isInitial) {
         setError('Error loading player data. Please try again.');
-        console.error('Error fetching initial left player data:', err);
-      } finally {
+      }
+      console.error(`Error fetching player data for ${playerId}:`, err);
+    } finally {
+      if (isInitial) {
         setIsLoading(false);
       }
     }
+  };
 
-    fetchInitialLeftPlayerData();
+  // Fetch initial left player data if provided
+  useEffect(() => {
+    if (!initialLeftPlayer) return;
+
+    fetchPlayerData(
+      initialLeftPlayer.playerId,
+      leftSelectedSeason,
+      setLeftPlayerData,
+      setLeftImageError,
+      setLeftSelectedSeason,
+      true
+    );
   }, [initialLeftPlayer, leftSelectedSeason]);
 
   // Fetch left player data when manually selected
   useEffect(() => {
-    async function fetchLeftPlayerData() {
-      if (!selectedLeftPlayer) {
-        setLeftPlayerData(null);
-        return;
-      }
-
-      setLeftImageError(false);
-      try {
-        const seasonParam = leftSelectedSeason ? `?season=${leftSelectedSeason}` : '';
-        const response = await fetch(`/api/player/${selectedLeftPlayer.player_id}${seasonParam}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch player data');
-        }
-        
-        const data: PlayerDataResponse = await response.json();
-        setLeftPlayerData(data);
-        
-        // Set default season if none specified
-        if (leftSelectedSeason === null && data.seasons && data.seasons.length > 0) {
-          setLeftSelectedSeason(data.seasons[0]);
-        }
-      } catch (err) {
-        console.error('Error fetching left player data:', err);
-      }
+    if (!selectedLeftPlayer) {
+      setLeftPlayerData(null);
+      return;
     }
 
-    fetchLeftPlayerData();
+    fetchPlayerData(
+      selectedLeftPlayer.player_id,
+      leftSelectedSeason,
+      setLeftPlayerData,
+      setLeftImageError,
+      setLeftSelectedSeason
+    );
   }, [selectedLeftPlayer, leftSelectedSeason]);
 
   // Fetch right player data when selected
   useEffect(() => {
-    async function fetchRightPlayerData() {
-      if (!selectedRightPlayer) {
-        setRightPlayerData(null);
-        return;
-      }
-
-      setRightImageError(false);
-      try {
-        const seasonParam = rightSelectedSeason ? `?season=${rightSelectedSeason}` : '';
-        const response = await fetch(`/api/player/${selectedRightPlayer.player_id}${seasonParam}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch player data');
-        }
-        
-        const data: PlayerDataResponse = await response.json();
-        setRightPlayerData(data);
-        
-        // Set default season if none specified
-        if (rightSelectedSeason === null && data.seasons && data.seasons.length > 0) {
-          setRightSelectedSeason(data.seasons[0]);
-        }
-      } catch (err) {
-        console.error('Error fetching right player data:', err);
-      }
+    if (!selectedRightPlayer) {
+      setRightPlayerData(null);
+      return;
     }
 
-    fetchRightPlayerData();
+    fetchPlayerData(
+      selectedRightPlayer.player_id,
+      rightSelectedSeason,
+      setRightPlayerData,
+      setRightImageError,
+      setRightSelectedSeason
+    );
   }, [selectedRightPlayer, rightSelectedSeason]);
 
   const handleLeftSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -232,8 +222,8 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
                     <Image 
                       src={!leftImageError && leftPlayerInfo?.headshot_url ? leftPlayerInfo.headshot_url : getDefaultImageUrl()}
                       alt={leftPlayerInfo?.player_display_name || ''}
-                      layout="fill" 
-                      objectFit="cover" 
+                      fill
+                      style={{ objectFit: 'cover' }}
                       onError={() => {
                         if (!leftImageError) setLeftImageError(true); 
                       }}
@@ -318,8 +308,8 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
                     <Image 
                       src={!rightImageError && rightPlayerInfo?.headshot_url ? rightPlayerInfo.headshot_url : getDefaultImageUrl()}
                       alt={rightPlayerInfo?.player_display_name || ''}
-                      layout="fill" 
-                      objectFit="cover" 
+                      fill
+                      style={{ objectFit: 'cover' }}
                       onError={() => {
                         if (!rightImageError) setRightImageError(true); 
                       }}
