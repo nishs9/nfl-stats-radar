@@ -19,6 +19,16 @@ export default function RootLayout({
       <body className={`${inter.className} relative pb-16`}>
         {children}
         <footer className="fixed bottom-0 left-0 right-0 w-full py-4 text-center text-gray-300 shadow-lg" style={{ backgroundColor: 'var(--brand-primary)' }}>
+          <div className="text-sm flex items-center justify-center gap-4">
+            <a
+              href="https://github.com/nflverse/nflverse-data/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors duration-200"
+            >
+              Data Source: nflverse
+            </a>
+          </div>
         </footer>
       </body>
     </html>
