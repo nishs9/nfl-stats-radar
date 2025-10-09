@@ -43,6 +43,7 @@ export interface CareerStats {
   rushing_yards?: number | null;
   rushing_tds?: number | null;
   receptions?: number | null;
+  targets?: number | null;
   receiving_epa?: number | null;
   receiving_yards?: number | null;
   receiving_tds?: number | null;
@@ -78,6 +79,7 @@ export interface GameLogStats {
   receiving_yards?: number | null;
   receiving_tds?: number | null;
   receiving_yards_after_catch?: number | null;
+  targets?: number | null;
   target_share?: number | null;
   air_yards_share?: number | null;
   racr?: number | null;

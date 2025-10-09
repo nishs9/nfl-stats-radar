@@ -41,7 +41,7 @@ export async function GET(
     const columnsToQuery = [
       'week', 'opponent_team', 'completions', 'attempts', 'passing_air_yards', 'passing_yards', 
       'passing_epa', 'passing_tds', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'receiving_epa', 
-      'receiving_yards', 'target_share', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 
+      'receiving_yards', 'target_share', 'targets', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 
       'fantasy_points_ppr', 'receptions', 'receiving_tds', 'receiving_yards_after_catch', 
       'carries', 'rushing_tds', 'yac_pct', 'yards_per_carry', 'yards_per_target', 'passing_interceptions'
     ];
