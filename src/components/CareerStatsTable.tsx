@@ -50,11 +50,11 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
       case 'QB':
         return [...baseColumns, 'completions', 'attempts', 'comp_pct', 'passing_yards', 'passing_air_yards', 'passing_tds', 'interceptions', 'passing_epa', 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
       case 'RB':
-        return [...baseColumns, 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'fantasy_points_ppr'];
+        return [...baseColumns, 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'receptions', 'targets', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'fantasy_points_ppr'];
       case 'WR':
-        return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
+        return [...baseColumns, 'receptions', 'targets', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'carries', 'rushing_yards', 'yards_per_carry', 'rushing_tds', 'rushing_epa', 'fantasy_points_ppr'];
       case 'TE':
-        return [...baseColumns, 'receptions', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'fantasy_points_ppr'];
+        return [...baseColumns, 'receptions', 'targets', 'receiving_yards', 'receiving_yards_after_catch', 'yards_per_target', 'receiving_tds', 'receiving_epa', 'target_share', 'racr', 'fantasy_points_ppr'];
       default:
         return [...baseColumns, 'games', 'fantasy_points_ppr'];
     }
@@ -87,6 +87,7 @@ export default function CareerStatsTable({ careerStats, position }: CareerStatsT
     receiving_epa: 'Rec EPA',
     rushing_epa: 'Rush EPA',
     receptions: 'Catches',
+    targets: 'Tgts',
     interceptions: 'Ints',
     yards_per_carry: 'Yds/Carry',
     yards_per_target: 'Yds/Tgt',
