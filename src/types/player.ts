@@ -57,6 +57,39 @@ export interface CareerStats {
   yac_pct?: number | null;
 }
 
+// Used for game logs table - similar to CareerStats but with week and opponent
+export interface GameLogStats {
+  week: number;
+  opponent_team: string;
+  completions?: number | null;
+  attempts?: number | null;
+  passing_yards?: number | null;
+  passing_air_yards?: number | null;
+  passing_epa?: number | null;
+  passing_tds?: number | null;
+  comp_pct?: number | null;
+  sack_rate?: number | null;
+  carries?: number | null;
+  rushing_epa?: number | null;
+  rushing_yards?: number | null;
+  rushing_tds?: number | null;
+  receptions?: number | null;
+  receiving_epa?: number | null;
+  receiving_yards?: number | null;
+  receiving_tds?: number | null;
+  receiving_yards_after_catch?: number | null;
+  target_share?: number | null;
+  air_yards_share?: number | null;
+  racr?: number | null;
+  wopr?: number | null;
+  total_turnovers?: number | null;
+  fantasy_points_ppr?: number | null;
+  yac_pct?: number | null;
+  yards_per_carry?: number | null;
+  yards_per_target?: number | null;
+  interceptions?: number | null;
+}
+
 // API response for player search suggestions
 export interface PlayerSearchResponse {
   player_id: string;
@@ -72,6 +105,13 @@ export interface PlayerDataResponse {
   stats: PlayerStats | null; 
   percentiles: PercentileStats | null; 
   careerStats: CareerStats[]; 
+}
+
+// API response for game logs data
+export interface GameLogsResponse {
+  gameLogs: GameLogStats[];
+  season: number;
+  message?: string;
 }
 
 // Helper function (can stay here or move to utils)
