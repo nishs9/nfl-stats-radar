@@ -33,7 +33,7 @@ def get_player_stats_season_data():
 
 def get_player_stats_week_data():
     player_stats_data_df_list = {}
-    for year in range(2015, 2026):
+    for year in range(1999, 2026):
         print(f"Downloading player weekly stats for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_{year}.csv.gz'
         raw_player_stats_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
