@@ -74,6 +74,7 @@ Desktop.ini
 # Database files
 *.sqlite
 *.sqlite3
+*.db
 
 # Ignore data files
 player_stats_season_*.csv
