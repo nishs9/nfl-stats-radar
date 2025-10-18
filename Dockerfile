@@ -15,13 +15,13 @@ RUN npm ci --verbose
 # Copy the rest of the application code
 COPY . .
 
-RUN git lfs fetch
-RUN git lfs checkout
-
 # List files for debugging (optional)
 RUN ls -la
 RUN ls -lah db/
 RUN head -c 100 db/nfl_stats.db || echo "DB file issue"
+
+RUN git lfs fetch
+RUN git lfs checkout
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
