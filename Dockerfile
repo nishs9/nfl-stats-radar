@@ -7,11 +7,6 @@ RUN apk add --no-cache python3 make g++ git git-lfs
 
 RUN git lfs install --skip-repo
 
-COPY .git .git
-COPY .gitattributes .gitattributes
-RUN git lfs fetch
-RUN git lfs checkout
-
 # Install dependencies first *inside the container*
 COPY package.json package-lock.json* ./
 # npm ci should now be able to build sqlite3 correctly for Alpine
@@ -19,6 +14,9 @@ RUN npm ci --verbose
 
 # Copy the rest of the application code
 COPY . .
+
+RUN git lfs fetch
+RUN git lfs checkout
 
 # List files for debugging (optional)
 RUN ls -la
