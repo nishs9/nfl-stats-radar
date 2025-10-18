@@ -3,7 +3,7 @@ FROM node:22.14-alpine
 WORKDIR /app
 
 # Add build tools needed for native modules like sqlite3
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ git git-lfs
 
 # Install dependencies first *inside the container*
 COPY package.json package-lock.json* ./
@@ -16,6 +16,7 @@ COPY . .
 # List files for debugging (optional)
 RUN ls -la
 RUN ls -la db/
+RUN file db/*.db  # This will show if it's actually a DB or an LFS pointer
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1

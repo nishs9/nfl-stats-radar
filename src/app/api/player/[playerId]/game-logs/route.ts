@@ -20,14 +20,6 @@ export async function GET(
     }
 
     const seasonYear = Number(season);
-    
-    // TODO: remove this check once we support pre-2015 game logs
-    if (seasonYear < 2015) {
-      return NextResponse.json({ 
-        error: 'Game logs are not available for seasons before 2015. Support for earlier seasons is coming soon!',
-        isPreSupported: true
-      }, { status: 400 });
-    }
 
     if (seasonYear > 2025) {
       return NextResponse.json({ 
