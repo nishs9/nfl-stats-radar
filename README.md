@@ -32,6 +32,8 @@ A website for visualizing NFL player statistics. The main feature of this web ap
 git clone https://github.com/nishs9/nfl-stats-radar.git
 cd nfl-stats-radar
 ```
+*Note: I access the DB via a Cloudflare R2 bucket. You can generate the DB yourself via the setup script in the db folder and tweak the access logic within db.ts and initDb.ts based on your own implementation.* 
+
 
 2. Install dependencies:
 ```bash
