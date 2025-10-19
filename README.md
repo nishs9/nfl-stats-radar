@@ -31,9 +31,8 @@ A website for visualizing NFL player statistics. The main feature of this web ap
 ```bash
 git clone https://github.com/nishs9/nfl-stats-radar.git
 cd nfl-stats-radar
-git lfs install # Install Git LFS on your system first
 ```
-*Note: The reason I store the DB directly in the repo and use Git LFS is because the DB is read-only and contains purely NFL statistics and so I don't need a particularly complex DB hosting solution. Just one that can support a file larger than 100MB* 
+*Note: I access the DB via a Cloudflare R2 bucket. You can generate the DB yourself via the setup script in the db folder and tweak the access logic within db.ts and initDb.ts based on your own implementation.* 
 
 
 2. Install dependencies:

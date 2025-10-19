@@ -1,4 +1,4 @@
-import { S3Client, GetObjectCommand, HeadObjectCommand} from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import fs from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
@@ -7,7 +7,7 @@ const DB_PATH = path.join(process.cwd(), 'db', 'nfl_stats.db');
 const CACHE_FILE = path.join(process.cwd(), 'db', '.db_cache_info');
 
 interface CacheInfo {
-    lastModified: string,
+    lastModified: string;
     etag: string;
 }
 
@@ -69,7 +69,7 @@ export async function initDb(): Promise<void> {
             const getCommand = new GetObjectCommand({
                 Bucket: process.env.R2_BUCKET_NAME,
                 Key: 'nfl_stats.db',
-            })
+            });
 
             const getResponse = await client.send(getCommand);
             if (getResponse.Body) {
@@ -81,6 +81,10 @@ export async function initDb(): Promise<void> {
                 }
 
                 fs.writeFileSync(DB_PATH, buffer);
+
+                if (remoteLastModified === undefined && remoteETag === undefined) {
+                    throw new Error("Missing LastModified and ETag from R2 response");
+                }
 
                 const cacheInfo: CacheInfo = {
                     lastModified: remoteLastModified!,
