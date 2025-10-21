@@ -166,7 +166,8 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
            <div className="flex flex-col md:flex-row items-center md:items-start">
             <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-6 bg-gray-700">
               <Image 
-                src={!imageError && playerInfo.headshot_url ? playerInfo.headshot_url : fallbackSrc}
+                // TODO: Figure out whether there is a copyright compliant way to get the headshot image
+                src={fallbackSrc}
                 alt={playerInfo.player_display_name}
                 layout="fill" 
                 objectFit="cover" 

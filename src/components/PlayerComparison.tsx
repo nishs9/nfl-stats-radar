@@ -306,7 +306,8 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
                 <div className="flex flex-col items-center">
                   <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0 mb-4 bg-gray-700">
                     <Image 
-                      src={!rightImageError && rightPlayerInfo?.headshot_url ? rightPlayerInfo.headshot_url : getDefaultImageUrl()}
+                    // TODO: Figure out whether there is a copyright compliant way to get the headshot image
+                      src={getDefaultImageUrl()}
                       alt={rightPlayerInfo?.player_display_name || ''}
                       fill
                       style={{ objectFit: 'cover' }}
