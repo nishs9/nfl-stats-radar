@@ -116,6 +116,42 @@ export interface GameLogsResponse {
   message?: string;
 }
 
+// Pass Map types
+export interface PassMapCellStats {
+  completions: number;
+  attempts: number;
+  completionPct: number | null;
+  airYards: number;
+  passingYards: number;
+  passingAirEpa: number;
+  airEpaPerPlay: number | null;
+  totalPassingEpa: number;
+  totalPassingEpaPerPlay: number | null;
+  touchdowns: number;
+  interceptions: number;
+}
+
+export interface PassMapData {
+  // key format: "{distance}_{location}"
+  [key: string]: PassMapCellStats;
+}
+
+export interface PassMapResponse {
+  passMapData: PassMapData;
+  season: number;
+  totalPlays?: number;
+  message?: string;
+}
+
+export type PassDistance = 'short' | 'medium' | 'medium_long' | 'long';
+export type PassLocation = 'left' | 'middle' | 'right';
+
+export interface PassMapStatOption {
+  key: keyof PassMapCellStats;
+  label: string;
+  format?: 'number' | 'percentage' | 'decimal';
+}
+
 // Helper function (can stay here or move to utils)
 // This should return StatDefinition[] now
 export function getStatsForPosition(position: string): StatDefinition[] {
