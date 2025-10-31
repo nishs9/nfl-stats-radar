@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PlayerDataResponse, getStatsForPosition, Player } from '@/types/player'; 
 import PercentileSlider from '@/components/PercentileSlider';
 import PlayerSearch from '@/components/PlayerSearch';
+import PassMapComparison from '@/components/PassMapComparison';
 import Image from 'next/image';
 
 interface PlayerComparisonProps {
@@ -31,6 +32,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   // UI state
   const [isLoading, setIsLoading] = useState(!!initialLeftPlayer);
   const [error, setError] = useState<string | null>(null);
+  const [viewType, setViewType] = useState<'stats' | 'passMaps'>('stats');
   
   const router = useRouter();
 
@@ -171,6 +173,15 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   const leftStatDefinitions = leftPlayerInfo ? getStatsForPosition(leftPlayerInfo.position) : [];
   const rightStatDefinitions = rightPlayerInfo ? getStatsForPosition(rightPlayerInfo.position) : [];
 
+  // Check if both players are QBs and seasons are valid for pass map
+  const canShowPassMaps = 
+    leftPlayerInfo?.position === 'QB' && 
+    rightPlayerInfo?.position === 'QB' &&
+    leftSelectedSeason !== null && 
+    rightSelectedSeason !== null &&
+    leftSelectedSeason >= 2019 && 
+    rightSelectedSeason >= 2019;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Navigation */}
@@ -196,8 +207,49 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
         <h1 className="text-3xl font-bold text-center">Player Comparison</h1>
       </div>
 
-      {/* Split Screen Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+      {/* View Toggle - Only show if both players are QBs with valid seasons */}
+      {canShowPassMaps && leftPlayerData && rightPlayerData && (
+        <div className="mb-6 flex justify-center">
+          <div className="bg-gray-100 rounded-lg p-1 inline-flex">
+            <button
+              onClick={() => setViewType('stats')}
+              className={`px-6 py-2 text-sm font-medium rounded-md transition-colors ${
+                viewType === 'stats' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'text-gray-700 hover:text-gray-900'
+              }`}
+            >
+              Stats Comparison
+            </button>
+            <button
+              onClick={() => setViewType('passMaps')}
+              className={`px-6 py-2 text-sm font-medium rounded-md transition-colors ${
+                viewType === 'passMaps' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'text-gray-700 hover:text-gray-900'
+              }`}
+            >
+              Pass Map Comparison
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Show Pass Map Comparison View */}
+      {viewType === 'passMaps' && canShowPassMaps && leftPlayerData && rightPlayerData ? (
+        <PassMapComparison
+          leftPlayerId={selectedLeftPlayer?.player_id || initialLeftPlayer?.playerId || ''}
+          leftPlayerName={leftPlayerInfo?.player_display_name || ''}
+          leftSeason={leftSelectedSeason || 0}
+          leftAvailableSeasons={leftSeasons}
+          rightPlayerId={selectedRightPlayer?.player_id || ''}
+          rightPlayerName={rightPlayerInfo?.player_display_name || ''}
+          rightSeason={rightSelectedSeason || 0}
+          rightAvailableSeasons={rightSeasons}
+        />
+      ) : (
+        /* Split Screen Layout for Stats Comparison */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
         
         {/* Left Player */}
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -377,6 +429,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
