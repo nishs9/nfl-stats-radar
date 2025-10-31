@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 from pathlib import Path
 
-def generate_derived_column_stats(df, year, is_week_data=False):
+def generate_derived_column_stats(df: pd.DataFrame, year: int, is_week_data: bool = False) -> pd.DataFrame:
     df['comp_pct'] = (df['completions'] / df['attempts']) * 100
     # is_week_data is a hacky workaround due to some inconsistencies in schema between seasons
     if year <= 2024 and not is_week_data:
@@ -20,7 +20,7 @@ def generate_derived_column_stats(df, year, is_week_data=False):
         df['interceptions'] = df['passing_interceptions']
     return df
 
-def get_player_stats_season_data():
+def get_player_stats_season_data() -> dict[int, pd.DataFrame]:
     player_stats_data_df_list = {}
     for year in range(1999, 2026):
         print(f"Downloading player season stats for {year}")
@@ -31,7 +31,7 @@ def get_player_stats_season_data():
         player_stats_data_df_list[year] = raw_player_stats_data
     return player_stats_data_df_list
 
-def get_player_stats_week_data():
+def get_player_stats_week_data() -> dict[int, pd.DataFrame]:
     player_stats_data_df_list = {}
     for year in range(1999, 2026):
         print(f"Downloading player weekly stats for {year}")
@@ -39,6 +39,15 @@ def get_player_stats_week_data():
         raw_player_stats_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
         player_stats_data_df_list[year] = raw_player_stats_data
     return player_stats_data_df_list
+
+def get_play_by_play_data() -> dict[int, pd.DataFrame]:
+    play_by_play_data_df_list = {}
+    for year in range(2019, 2026):
+        print(f"Downloading play by play data for {year}")
+        base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.csv.gz'
+        raw_play_by_play_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
+        play_by_play_data_df_list[year] = raw_play_by_play_data
+    return play_by_play_data_df_list
 
 def create_database_online(conn: sqlite3.Connection):
     cursor = conn.cursor()
@@ -56,6 +65,13 @@ def create_database_online(conn: sqlite3.Connection):
         df = generate_derived_column_stats(df, year, is_week_data=True)
         df.to_sql(table_name, conn, if_exists='replace', index=False)
         cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{table_name}_player_week ON {table_name}(player_id, season, week, team)")
+        print(f"Created table {table_name} with {len(df)} rows")
+
+    play_by_play_data_df_list = get_play_by_play_data()
+    for year, df in play_by_play_data_df_list.items():
+        table_name = f'play_by_play_{year}'
+        df.to_sql(table_name, conn, if_exists='replace', index=False)
+        cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{table_name}_play_by_play ON {table_name}(game_id, play_id)")
         print(f"Created table {table_name} with {len(df)} rows")
 
     print("Online database setup complete!")
