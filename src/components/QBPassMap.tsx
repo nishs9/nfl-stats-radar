@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PassMapResponse, PassMapData, PassMapStatOption } from '@/types/player';
+import { PassMapResponse, PassMapData } from '@/types/player';
 import PassMapCell from './PassMapCell';
 import PassMapStatSelector, { AVAILABLE_STATS } from './PassMapStatSelector';
 
@@ -30,10 +30,11 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedStats, setSelectedStats] = useState<string[]>([
-    'attempts',
     'completions',
     'completionPct',
+    'airYards',
     'passingYards',
+    'totalPassingEpaPerPlay',
     'touchdowns',
     'interceptions'
   ]);
