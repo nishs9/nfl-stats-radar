@@ -6,6 +6,7 @@ import { PlayerDataResponse, GameLogsResponse, getStatsForPosition } from '@/typ
 import PercentileSlider from '@/components/PercentileSlider';
 import CareerStatsTable from '@/components/CareerStatsTable';
 import GameLogsTable from '@/components/GameLogsTable';
+import QBPassMap from '@/components/QBPassMap';
 import Image from 'next/image';
 
 // Try using PageProps directly
@@ -15,7 +16,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const [error, setError] = useState<string | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [imageError, setImageError] = useState(false);
-  const [showGameLogs, setShowGameLogs] = useState(false);
+  const [viewType, setViewType] = useState<'stats' | 'gameLogs' | 'passMap'>('stats');
   const [gameLogsData, setGameLogsData] = useState<GameLogsResponse | null>(null);
   const [gameLogsLoading, setGameLogsLoading] = useState(false);
   const [gameLogsError, setGameLogsError] = useState<string | null>(null);
@@ -58,12 +59,12 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
   };
 
-  // Handle toggle between default view and game logs
-  const handleToggleView = (showLogs: boolean) => {
-    setShowGameLogs(showLogs);
+  // Handle toggle between different views
+  const handleViewTypeChange = (newViewType: 'stats' | 'gameLogs' | 'passMap') => {
+    setViewType(newViewType);
     
     // Fetch game logs when switching to game logs view
-    if (showLogs && selectedSeason) {
+    if (newViewType === 'gameLogs' && selectedSeason) {
       fetchGameLogs(selectedSeason);
     }
   };
@@ -108,8 +109,13 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     setSelectedSeason(newSeason);
     
     // If we're currently showing game logs, fetch the new season's game logs
-    if (showGameLogs) {
+    if (viewType === 'gameLogs') {
       fetchGameLogs(newSeason);
+    }
+    
+    // If we're showing pass map and switching to pre-2019, switch to stats view
+    if (viewType === 'passMap' && newSeason < 2019) {
+      setViewType('stats');
     }
   };
 
@@ -203,9 +209,9 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                   </label>
                   <div className="flex bg-gray-700 rounded-md p-1">
                     <button
-                      onClick={() => handleToggleView(false)}
+                      onClick={() => handleViewTypeChange('stats')}
                       className={`px-3 py-1 text-sm rounded transition-colors ${
-                        !showGameLogs 
+                        viewType === 'stats' 
                           ? 'bg-blue-500 text-white' 
                           : 'text-gray-300 hover:text-white'
                       }`}
@@ -213,15 +219,31 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                       Season Stats
                     </button>
                     <button
-                      onClick={() => handleToggleView(true)}
+                      onClick={() => handleViewTypeChange('gameLogs')}
                       className={`px-3 py-1 text-sm rounded transition-colors ${
-                        showGameLogs 
+                        viewType === 'gameLogs' 
                           ? 'bg-blue-500 text-white' 
                           : 'text-gray-300 hover:text-white'
                       }`}
                     >
                       Game Logs
                     </button>
+                    {playerInfo.position === 'QB' && (
+                      <button
+                        onClick={() => handleViewTypeChange('passMap')}
+                        disabled={selectedSeason !== null && selectedSeason < 2019}
+                        className={`px-3 py-1 text-sm rounded transition-colors ${
+                          viewType === 'passMap' 
+                            ? 'bg-blue-500 text-white' 
+                            : selectedSeason !== null && selectedSeason < 2019
+                            ? 'text-gray-500 cursor-not-allowed'
+                            : 'text-gray-300 hover:text-white'
+                        }`}
+                        title={selectedSeason !== null && selectedSeason < 2019 ? 'QB Pass Maps are only available from 2019 onwards' : ''}
+                      >
+                        Pass Map
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -230,7 +252,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         </div>
 
         <div className="p-6">
-          {!showGameLogs ? (
+          {viewType === 'stats' ? (
             // Default view - Season Stats with Percentile Rankings
             <>
               <h2 className="text-2xl font-bold mb-6">Statistical Rankings for {selectedSeason}</h2>
@@ -256,7 +278,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                 </div>
               )}
             </>
-          ) : (
+          ) : viewType === 'gameLogs' ? (
             // Game Logs view
             <>
               <h2 className="text-2xl font-bold mb-6">Game Logs for {selectedSeason}</h2>
@@ -287,7 +309,20 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                 </div>
               )}
             </>
-          )}
+          ) : viewType === 'passMap' ? (
+            // Pass Map view
+            <>
+              <h2 className="text-2xl font-bold mb-6">Pass Map for {selectedSeason}</h2>
+              
+              {selectedSeason && selectedSeason < 2019 ? (
+                <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
+                  Pass map data is only available from 2019 onwards. Please select a more recent season.
+                </div>
+              ) : (
+                <QBPassMap playerId={playerId} season={selectedSeason || 0} />
+              )}
+            </>
+          ) : null}
         </div>
       </div>
 

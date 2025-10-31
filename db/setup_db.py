@@ -1,6 +1,60 @@
 import sqlite3
 import pandas as pd
+import os
+import boto3
+from tqdm import tqdm
+from boto3.s3.transfer import TransferConfig
 from pathlib import Path
+from r2_secrets import CF_R2_ACCOUNT_ID, CF_R2_ACCESS_KEY_ID, CF_R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_DB_FILE_NAME
+
+# TODO: Clean this script up
+
+S3_endpoint = f"https://{CF_R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+
+# Progress bar callback
+class TqdmCallback:
+    def __init__(self, total_bytes):
+        self.pbar = tqdm(total=total_bytes, unit="B", unit_scale=True, unit_divisor=1024)
+    def __call__(self, bytes_amount):
+        self.pbar.update(bytes_amount)
+    def close(self):
+        self.pbar.close()
+
+def upload_db_to_r2():
+    part_size = 64 * 1024 * 1024
+    config = TransferConfig(
+        multipart_threshold=part_size,
+        multipart_chunksize=part_size,
+        max_concurrency=8,
+        use_threads=True,
+    )
+
+    s3 = boto3.client(
+        's3',
+        endpoint_url=S3_endpoint,
+        aws_access_key_id=CF_R2_ACCESS_KEY_ID,
+        aws_secret_access_key=CF_R2_SECRET_ACCESS_KEY,
+        region_name='auto',
+    )
+
+    size = os.path.getsize(R2_DB_FILE_NAME)
+    callback = TqdmCallback(size)
+
+    try:
+        s3.upload_file(
+            Filename=R2_DB_FILE_NAME,
+            Bucket=R2_BUCKET_NAME,
+            Key=R2_DB_FILE_NAME,
+            Config=config,
+            Callback=callback,
+            ExtraArgs={}
+        )
+        print(f"Uploaded {R2_DB_FILE_NAME} to {R2_BUCKET_NAME} successfully")
+    except Exception as e:
+        print(f"Error uploading {R2_DB_FILE_NAME} to {R2_BUCKET_NAME}: {e}")
+        raise e
+    finally:
+        callback.close()
 
 def generate_derived_column_stats(df: pd.DataFrame, year: int, is_week_data: bool = False) -> pd.DataFrame:
     df['comp_pct'] = (df['completions'] / df['attempts']) * 100
@@ -100,7 +154,8 @@ def create_database(conn: sqlite3.Connection):
     print("Database setup complete!")
 
 if __name__ == "__main__":
-    conn = sqlite3.connect('nfl_stats.db')
-    create_database_online(conn)
-    conn.commit()
-    conn.close() 
+    # conn = sqlite3.connect('nfl_stats.db')
+    # create_database_online(conn)
+    # conn.commit()
+    # conn.close() 
+    upload_db_to_r2()
