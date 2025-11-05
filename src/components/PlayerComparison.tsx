@@ -179,8 +179,8 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     rightPlayerInfo?.position === 'QB' &&
     leftSelectedSeason !== null && 
     rightSelectedSeason !== null &&
-    leftSelectedSeason >= 2019 && 
-    rightSelectedSeason >= 2019;
+    leftSelectedSeason >= 2015 && 
+    rightSelectedSeason >= 2015;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

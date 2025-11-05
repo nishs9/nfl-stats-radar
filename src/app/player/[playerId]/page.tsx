@@ -9,7 +9,6 @@ import GameLogsTable from '@/components/GameLogsTable';
 import QBPassMap from '@/components/QBPassMap';
 import Image from 'next/image';
 
-// Try using PageProps directly
 export default function PlayerPage({params}: {params: Promise<{ playerId: string }>}) {
   const [playerData, setPlayerData] = useState<PlayerDataResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,10 +22,8 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // params should be directly usable here in a client component
-  const playerId = use(params).playerId; // Extract playerId from params
+  const playerId = use(params).playerId;
 
-  // Read season from URL query parameters on mount
   useEffect(() => {
     const seasonFromUrl = searchParams.get('season');
     if (seasonFromUrl && !isNaN(Number(seasonFromUrl))) {
@@ -34,7 +31,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
   }, [searchParams]);
 
-  // Function to fetch game logs data
   const fetchGameLogs = async (season: number) => {
     if (!playerId || !season) return;
     
@@ -59,11 +55,9 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
   };
 
-  // Handle toggle between different views
   const handleViewTypeChange = (newViewType: 'stats' | 'gameLogs' | 'passMap') => {
     setViewType(newViewType);
     
-    // Fetch game logs when switching to game logs view
     if (newViewType === 'gameLogs' && selectedSeason) {
       fetchGameLogs(selectedSeason);
     }
@@ -71,12 +65,10 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
 
   useEffect(() => {
     async function fetchPlayerData() {
-      // ... fetch logic ...
       setIsLoading(true);
       setImageError(false);
       try {
         const seasonParam = selectedSeason ? `?season=${selectedSeason}` : '';
-        // Use the extracted playerId
         const response = await fetch(`/api/player/${playerId}${seasonParam}`); 
         
         if (!response.ok) {
@@ -86,7 +78,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         const data: PlayerDataResponse = await response.json();
         setPlayerData(data);
         
-        // Only set default season if no season was specified in URL and selectedSeason is still null
         if (selectedSeason === null && data.seasons && data.seasons.length > 0 && !searchParams.get('season')) {
           setSelectedSeason(data.seasons[0]);
         }
@@ -103,7 +94,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
   }, [playerId, selectedSeason, searchParams]);
 
-  // ... (rest of the component logic remains the same) ...
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSeason = Number(e.target.value);
     setSelectedSeason(newSeason);
@@ -113,8 +103,8 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
       fetchGameLogs(newSeason);
     }
     
-    // If we're showing pass map and switching to pre-2019, switch to stats view
-    if (viewType === 'passMap' && newSeason < 2019) {
+    // If we're showing pass map and switching to pre-2015, switch to stats view
+    if (viewType === 'passMap' && newSeason < 2015) {
       setViewType('stats');
     }
   };
@@ -123,14 +113,14 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     return "/placeholder.jpg";
   };
 
-  if (isLoading) { /* ... loading JSX ... */ 
+  if (isLoading) { 
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-  if (error || !playerData) { /* ... error JSX ... */ 
+  if (error || !playerData) {
      return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -150,7 +140,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const statDefinitions = getStatsForPosition(playerInfo.position); 
   const fallbackSrc = getDefaultImageUrl();
 
-  return ( /* ... component JSX ... */ 
+  return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8 flex gap-4">
         <button 
@@ -231,15 +221,15 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                     {playerInfo.position === 'QB' && (
                       <button
                         onClick={() => handleViewTypeChange('passMap')}
-                        disabled={selectedSeason !== null && selectedSeason < 2019}
+                        disabled={selectedSeason !== null && selectedSeason < 2015}
                         className={`px-3 py-1 text-sm rounded transition-colors ${
                           viewType === 'passMap' 
                             ? 'bg-blue-500 text-white' 
-                            : selectedSeason !== null && selectedSeason < 2019
+                            : selectedSeason !== null && selectedSeason < 2015
                             ? 'text-gray-500 cursor-not-allowed'
                             : 'text-gray-300 hover:text-white'
                         }`}
-                        title={selectedSeason !== null && selectedSeason < 2019 ? 'QB Pass Maps are only available from 2019 onwards' : ''}
+                        title={selectedSeason !== null && selectedSeason < 2015 ? 'QB Pass Maps are only available from 2015 onwards' : ''}
                       >
                         Pass Map
                       </button>
@@ -253,7 +243,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
 
         <div className="p-6">
           {viewType === 'stats' ? (
-            // Default view - Season Stats with Percentile Rankings
             <>
               <h2 className="text-2xl font-bold mb-6">Statistical Rankings for {selectedSeason}</h2>
               
@@ -279,7 +268,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
               )}
             </>
           ) : viewType === 'gameLogs' ? (
-            // Game Logs view
             <>
               <h2 className="text-2xl font-bold mb-6">Game Logs for {selectedSeason}</h2>
               
@@ -310,13 +298,12 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
               )}
             </>
           ) : viewType === 'passMap' ? (
-            // Pass Map view
             <>
               <h2 className="text-2xl font-bold mb-6">Pass Map for {selectedSeason}</h2>
               
-              {selectedSeason && selectedSeason < 2019 ? (
+              {selectedSeason && selectedSeason < 2015 ? (
                 <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
-                  Pass map data is only available from 2019 onwards. Please select a more recent season.
+                  Pass map data is only available from 2015 onwards. Please select a more recent season.
                 </div>
               ) : (
                 <QBPassMap playerId={playerId} season={selectedSeason || 0} />

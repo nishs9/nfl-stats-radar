@@ -158,4 +158,4 @@ if __name__ == "__main__":
     create_database_online(conn)
     conn.commit()
     conn.close() 
-    #upload_db_to_r2()
+    upload_db_to_r2()
