@@ -96,7 +96,7 @@ def get_player_stats_week_data() -> dict[int, pd.DataFrame]:
 
 def get_play_by_play_data() -> dict[int, pd.DataFrame]:
     play_by_play_data_df_list = {}
-    for year in range(2019, 2026):
+    for year in range(2015, 2026):
         print(f"Downloading play by play data for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.csv.gz'
         raw_play_by_play_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
@@ -154,8 +154,8 @@ def create_database(conn: sqlite3.Connection):
     print("Database setup complete!")
 
 if __name__ == "__main__":
-    # conn = sqlite3.connect('nfl_stats.db')
-    # create_database_online(conn)
-    # conn.commit()
-    # conn.close() 
-    upload_db_to_r2()
+    conn = sqlite3.connect('nfl_stats.db')
+    create_database_online(conn)
+    conn.commit()
+    conn.close() 
+    #upload_db_to_r2()
