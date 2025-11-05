@@ -48,8 +48,8 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
       }
 
       // Validate season range
-      if (season < 2019) {
-        setError('Pass map data is only available from 2019 onwards. Please select a more recent season.');
+      if (season < 2015) {
+        setError('Pass map data is only available from 2015 onwards. Please select a more recent season.');
         setIsLoading(false);
         return;
       }
@@ -66,8 +66,8 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
           const errorData = await response.json().catch(() => ({ error: 'Failed to fetch pass map data' }));
           
           // Handle specific error cases
-          if (errorData.isPre2019) {
-            throw new Error('Pass map data is only available from 2019 onwards. Please select a more recent season.');
+          if (errorData.isPre2015) {
+            throw new Error('Pass map data is only available from 2015 onwards. Please select a more recent season.');
           }
           
           if (errorData.isDataUnavailable) {
@@ -238,7 +238,7 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
         <div className="text-sm text-blue-900">
           <p className="font-semibold mb-2">QB Pass Map Info</p>
           <ul className="list-disc list-inside space-y-1 text-xs">
-            <li>QB pass maps are only available from 2019 onwards.</li>
+            <li>QB pass maps are only available from 2015 onwards.</li>
             <li>QB pass maps are based on regular season data only.</li>
             <li>Cell colors represent completion percentage: red (low) → yellow (mid) → green (high)</li>
             <li>Use the stat selector above to customize which statistics are displayed in each cell</li>
