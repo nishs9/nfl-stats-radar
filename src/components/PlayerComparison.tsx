@@ -66,8 +66,11 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
       if (data.seasons && data.seasons.length > 0) {
         const selectedSeasonValue = initialSeason || data.seasons[0];
         setSelectedSeason(selectedSeasonValue);
-        // Mark this season as loaded since initial fetch includes first season stats
-        setLoadedSeason(selectedSeasonValue);
+        // Only mark as loaded if we got stats for the season we actually selected
+        // API returns first season's stats, so only mark loaded if no initialSeason or if it matches first season
+        if (!initialSeason || initialSeason === data.seasons[0]) {
+          setLoadedSeason(selectedSeasonValue);
+        }
       }
     } catch (err) {
       if (isLeftPlayer) {
@@ -135,7 +138,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     if (leftLoadedSeason === leftSelectedSeason) return;
 
     fetchSeasonStats(playerId, leftSelectedSeason, setLeftPlayerData, setLeftLoadedSeason, leftPlayerData);
-  }, [leftSelectedSeason, initialLeftPlayer?.playerId, selectedLeftPlayer?.player_id, leftPlayerData, leftLoadedSeason]);
+  }, [leftSelectedSeason, initialLeftPlayer, selectedLeftPlayer, leftLoadedSeason]);
 
   // Fetch left player data when manually selected
   useEffect(() => {
@@ -179,7 +182,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     if (rightLoadedSeason === rightSelectedSeason) return;
 
     fetchSeasonStats(selectedRightPlayer.player_id, rightSelectedSeason, setRightPlayerData, setRightLoadedSeason, rightPlayerData);
-  }, [rightSelectedSeason, selectedRightPlayer, rightPlayerData, rightLoadedSeason]);
+  }, [rightSelectedSeason, selectedRightPlayer, rightLoadedSeason]);
 
   const handleLeftSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLeftSelectedSeason(Number(e.target.value));

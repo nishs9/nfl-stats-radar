@@ -83,8 +83,11 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
           const urlSeason = searchParams.get('season');
           const initialSeason = urlSeason ? Number(urlSeason) : data.seasons[0];
           setSelectedSeason(initialSeason);
-          // Mark this season as loaded since initial fetch includes first season stats
-          setLoadedSeason(initialSeason);
+          // Only mark as loaded if we got stats for the season we actually selected
+          // API returns first season's stats, so only mark loaded if no URL season or if it matches first season
+          if (!urlSeason || initialSeason === data.seasons[0]) {
+            setLoadedSeason(initialSeason);
+          }
         }
       } catch (err) {
         setError('Error loading player data. Please try again.');
