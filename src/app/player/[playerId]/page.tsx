@@ -14,6 +14,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
+  const [loadedSeason, setLoadedSeason] = useState<number | null>(null);
   const [imageError, setImageError] = useState(false);
   const [viewType, setViewType] = useState<'stats' | 'gameLogs' | 'passMap' | 'career'>('stats');
   const [gameLogsData, setGameLogsData] = useState<GameLogsResponse | null>(null);
@@ -80,7 +81,10 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         // Set initial season if not already set
         if (selectedSeason === null && data.seasons && data.seasons.length > 0) {
           const urlSeason = searchParams.get('season');
-          setSelectedSeason(urlSeason ? Number(urlSeason) : data.seasons[0]);
+          const initialSeason = urlSeason ? Number(urlSeason) : data.seasons[0];
+          setSelectedSeason(initialSeason);
+          // Mark this season as loaded since initial fetch includes first season stats
+          setLoadedSeason(initialSeason);
         }
       } catch (err) {
         setError('Error loading player data. Please try again.');
@@ -100,6 +104,9 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     async function fetchSeasonStats() {
       if (!playerId || !selectedSeason || !playerData) return;
       
+      // Only fetch if we haven't loaded this season yet
+      if (loadedSeason === selectedSeason) return;
+      
       try {
         const response = await fetch(`/api/player/${playerId}?season=${selectedSeason}`);
         
@@ -114,13 +121,14 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
           stats: data.stats,
           percentiles: data.percentiles
         } : data);
+        setLoadedSeason(selectedSeason);
       } catch (err) {
         console.error('Error fetching season stats:', err);
       }
     }
 
     fetchSeasonStats();
-  }, [playerId, selectedSeason, playerData?.playerInfo]);
+  }, [playerId, selectedSeason, playerData, loadedSeason]);
 
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSeason = Number(e.target.value);

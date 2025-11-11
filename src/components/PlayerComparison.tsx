@@ -22,12 +22,14 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   const [leftImageError, setLeftImageError] = useState(false);
   const [selectedLeftPlayer, setSelectedLeftPlayer] = useState<Player | null>(null);
   const [showLeftPlayerSearch, setShowLeftPlayerSearch] = useState(!initialLeftPlayer);
+  const [leftLoadedSeason, setLeftLoadedSeason] = useState<number | null>(null);
   
   // Right player state
   const [rightPlayerData, setRightPlayerData] = useState<PlayerDataResponse | null>(null);
   const [rightSelectedSeason, setRightSelectedSeason] = useState<number | null>(null);
   const [rightImageError, setRightImageError] = useState(false);
   const [selectedRightPlayer, setSelectedRightPlayer] = useState<Player | null>(null);
+  const [rightLoadedSeason, setRightLoadedSeason] = useState<number | null>(null);
   
   // UI state
   const [isLoading, setIsLoading] = useState(!!initialLeftPlayer);
@@ -41,6 +43,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     setPlayerData: (data: PlayerDataResponse | null) => void,
     setImageError: (error: boolean) => void,
     setSelectedSeason: (season: number) => void,
+    setLoadedSeason: (season: number) => void,
     initialSeason: number | null = null,
     isLeftPlayer = false
   ) => {
@@ -61,7 +64,10 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
       
       // Set default season
       if (data.seasons && data.seasons.length > 0) {
-        setSelectedSeason(initialSeason || data.seasons[0]);
+        const selectedSeasonValue = initialSeason || data.seasons[0];
+        setSelectedSeason(selectedSeasonValue);
+        // Mark this season as loaded since initial fetch includes first season stats
+        setLoadedSeason(selectedSeasonValue);
       }
     } catch (err) {
       if (isLeftPlayer) {
@@ -80,6 +86,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     playerId: string,
     season: number,
     setPlayerData: (data: PlayerDataResponse | null) => void,
+    setLoadedSeason: (season: number) => void,
     currentData: PlayerDataResponse | null
   ) => {
     if (!currentData) return;
@@ -98,6 +105,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
         stats: data.stats,
         percentiles: data.percentiles
       });
+      setLoadedSeason(season);
     } catch (err) {
       console.error(`Error fetching season stats for ${playerId}:`, err);
     }
@@ -112,6 +120,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
       setLeftPlayerData,
       setLeftImageError,
       setLeftSelectedSeason,
+      setLeftLoadedSeason,
       initialLeftPlayer.season || null,
       true
     );
@@ -121,14 +130,18 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   useEffect(() => {
     const playerId = initialLeftPlayer?.playerId || selectedLeftPlayer?.player_id;
     if (!playerId || !leftSelectedSeason || !leftPlayerData) return;
+    
+    // Only fetch if we haven't loaded this season yet
+    if (leftLoadedSeason === leftSelectedSeason) return;
 
-    fetchSeasonStats(playerId, leftSelectedSeason, setLeftPlayerData, leftPlayerData);
-  }, [leftSelectedSeason]);
+    fetchSeasonStats(playerId, leftSelectedSeason, setLeftPlayerData, setLeftLoadedSeason, leftPlayerData);
+  }, [leftSelectedSeason, initialLeftPlayer?.playerId, selectedLeftPlayer?.player_id, leftPlayerData, leftLoadedSeason]);
 
   // Fetch left player data when manually selected
   useEffect(() => {
     if (!selectedLeftPlayer) {
       setLeftPlayerData(null);
+      setLeftLoadedSeason(null);
       return;
     }
 
@@ -136,7 +149,8 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
       selectedLeftPlayer.player_id,
       setLeftPlayerData,
       setLeftImageError,
-      setLeftSelectedSeason
+      setLeftSelectedSeason,
+      setLeftLoadedSeason
     );
   }, [selectedLeftPlayer?.player_id]);
 
@@ -144,6 +158,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   useEffect(() => {
     if (!selectedRightPlayer) {
       setRightPlayerData(null);
+      setRightLoadedSeason(null);
       return;
     }
 
@@ -151,16 +166,20 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
       selectedRightPlayer.player_id,
       setRightPlayerData,
       setRightImageError,
-      setRightSelectedSeason
+      setRightSelectedSeason,
+      setRightLoadedSeason
     );
   }, [selectedRightPlayer?.player_id]);
 
   // Fetch season stats when right player season changes
   useEffect(() => {
     if (!selectedRightPlayer || !rightSelectedSeason || !rightPlayerData) return;
+    
+    // Only fetch if we haven't loaded this season yet
+    if (rightLoadedSeason === rightSelectedSeason) return;
 
-    fetchSeasonStats(selectedRightPlayer.player_id, rightSelectedSeason, setRightPlayerData, rightPlayerData);
-  }, [rightSelectedSeason]);
+    fetchSeasonStats(selectedRightPlayer.player_id, rightSelectedSeason, setRightPlayerData, setRightLoadedSeason, rightPlayerData);
+  }, [rightSelectedSeason, selectedRightPlayer, rightPlayerData, rightLoadedSeason]);
 
   const handleLeftSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLeftSelectedSeason(Number(e.target.value));
