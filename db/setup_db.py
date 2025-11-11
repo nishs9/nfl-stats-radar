@@ -6,6 +6,7 @@ from tqdm import tqdm
 from boto3.s3.transfer import TransferConfig
 from pathlib import Path
 from r2_secrets import CF_R2_ACCOUNT_ID, CF_R2_ACCESS_KEY_ID, CF_R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_DB_FILE_NAME
+from constants import pbp_filter_columns
 
 # TODO: Clean this script up
 
@@ -96,15 +97,24 @@ def get_player_stats_week_data() -> dict[int, pd.DataFrame]:
 
 def get_play_by_play_data() -> dict[int, pd.DataFrame]:
     play_by_play_data_df_list = {}
-    for year in range(2015, 2026):
+    for year in range(2010, 2026):
         print(f"Downloading play by play data for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.csv.gz'
         raw_play_by_play_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
-        play_by_play_data_df_list[year] = raw_play_by_play_data
+        filtered_play_by_play_data = raw_play_by_play_data[pbp_filter_columns]
+        play_by_play_data_df_list[year] = filtered_play_by_play_data
     return play_by_play_data_df_list
 
 def create_database_online(conn: sqlite3.Connection):
     cursor = conn.cursor()
+
+    play_by_play_data_df_list = get_play_by_play_data()
+    for year, df in play_by_play_data_df_list.items():
+        table_name = f'play_by_play_{year}'
+        df.to_sql(table_name, conn, if_exists='replace', index=False)
+        cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{table_name}_play_by_play ON {table_name}(game_id, play_id)")
+        print(f"Created table {table_name} with {len(df)} rows")
+
     player_stats_season_data_df_list = get_player_stats_season_data()
     for year, df in player_stats_season_data_df_list.items():
         table_name = f'player_stats_season_{year}'
@@ -119,13 +129,6 @@ def create_database_online(conn: sqlite3.Connection):
         df = generate_derived_column_stats(df, year, is_week_data=True)
         df.to_sql(table_name, conn, if_exists='replace', index=False)
         cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{table_name}_player_week ON {table_name}(player_id, season, week, team)")
-        print(f"Created table {table_name} with {len(df)} rows")
-
-    play_by_play_data_df_list = get_play_by_play_data()
-    for year, df in play_by_play_data_df_list.items():
-        table_name = f'play_by_play_{year}'
-        df.to_sql(table_name, conn, if_exists='replace', index=False)
-        cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{table_name}_play_by_play ON {table_name}(game_id, play_id)")
         print(f"Created table {table_name} with {len(df)} rows")
 
     print("Online database setup complete!")
@@ -158,4 +161,4 @@ if __name__ == "__main__":
     create_database_online(conn)
     conn.commit()
     conn.close() 
-    upload_db_to_r2()
+    #upload_db_to_r2()
