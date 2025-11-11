@@ -166,7 +166,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
 
   const { playerInfo, seasons, stats, percentiles, careerStats } = playerData;
   const statDefinitions = getStatsForPosition(playerInfo.position); 
-  const fallbackSrc = getDefaultImageUrl();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -191,10 +190,10 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
             <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-6 bg-gray-700">
               <Image 
                 // TODO: Figure out whether there is a copyright compliant way to get the headshot image
-                src={fallbackSrc}
+                src={!imageError && playerInfo?.headshot_url ? playerInfo.headshot_url : getDefaultImageUrl()}
                 alt={playerInfo.player_display_name}
-                layout="fill" 
-                objectFit="cover" 
+                fill
+                style={{ objectFit: 'cover' }}
                 onError={() => {
                   if (!imageError) setImageError(true); 
                 }}

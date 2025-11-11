@@ -150,30 +150,6 @@ export default function PassMapComparison({
     availableSeasons: number[],
     onSeasonChange: (season: number) => void
   ) => {
-    if (isLoading) {
-      return (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-          <p className="text-sm text-yellow-800 font-medium">{error}</p>
-        </div>
-      );
-    }
-
-    if (!passMapData) {
-      return (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <p className="text-sm text-gray-600 font-medium">No pass map data available</p>
-        </div>
-      );
-    }
-
     return (
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
@@ -194,51 +170,64 @@ export default function PassMapComparison({
             </select>
           </div>
         </div>
-        
-        <div className="overflow-x-auto shadow-md rounded-lg">
-          <div className="inline-block min-w-full">
-            <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-0 bg-white">
-              {/* Header Row */}
-              <div className="border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 p-2"></div>
-              {LOCATIONS.map(location => (
-                <div
-                  key={location}
-                  className="border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 p-2 text-center font-bold text-gray-800 text-xs"
-                >
-                  {LOCATION_LABELS[location]}
-                </div>
-              ))}
-
-              {/* Data Rows */}
-              {DISTANCES.map(distance => (
-                <React.Fragment key={distance}>
-                  {/* Distance Label */}
-                  <div className="border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 p-2 flex items-center justify-center font-bold text-gray-800 text-xs whitespace-nowrap min-w-[100px]">
-                    <div className="text-center">
-                      {DISTANCE_LABELS[distance]}
-                    </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : error ? (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <p className="text-sm text-yellow-800 font-medium">{error}</p>
+          </div>
+        ) : !passMapData ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <p className="text-sm text-gray-600 font-medium">No pass map data available for seasons before 2015</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto shadow-md rounded-lg">
+            <div className="inline-block min-w-full">
+              <div className="grid grid-cols-[auto_1fr_1fr_1fr] gap-0 bg-white">
+                {/* Header Row */}
+                <div className="border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 p-2"></div>
+                {LOCATIONS.map(location => (
+                  <div
+                    key={location}
+                    className="border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 p-2 text-center font-bold text-gray-800 text-xs"
+                  >
+                    {LOCATION_LABELS[location]}
                   </div>
+                ))}
 
-                  {/* Cells for each location */}
-                  {LOCATIONS.map(location => {
-                    const key = `${distance}_${location}`;
-                    const cellStats = passMapData[key];
+                {/* Data Rows */}
+                {DISTANCES.map(distance => (
+                  <React.Fragment key={distance}>
+                    {/* Distance Label */}
+                    <div className="border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 p-2 flex items-center justify-center font-bold text-gray-800 text-xs whitespace-nowrap min-w-[100px]">
+                      <div className="text-center">
+                        {DISTANCE_LABELS[distance]}
+                      </div>
+                    </div>
 
-                    return (
-                      <PassMapCell
-                        key={key}
-                        stats={cellStats}
-                        distance={distance}
-                        location={location}
-                        selectedStats={selectedStatOptions}
-                      />
-                    );
-                  })}
-                </React.Fragment>
-              ))}
+                    {/* Cells for each location */}
+                    {LOCATIONS.map(location => {
+                      const key = `${distance}_${location}`;
+                      const cellStats = passMapData[key];
+
+                      return (
+                        <PassMapCell
+                          key={key}
+                          stats={cellStats}
+                          distance={distance}
+                          location={location}
+                          selectedStats={selectedStatOptions}
+                        />
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     );
   };
