@@ -15,7 +15,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const [error, setError] = useState<string | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [imageError, setImageError] = useState(false);
-  const [viewType, setViewType] = useState<'stats' | 'gameLogs' | 'passMap'>('stats');
+  const [viewType, setViewType] = useState<'stats' | 'gameLogs' | 'passMap' | 'career'>('stats');
   const [gameLogsData, setGameLogsData] = useState<GameLogsResponse | null>(null);
   const [gameLogsLoading, setGameLogsLoading] = useState(false);
   const [gameLogsError, setGameLogsError] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
   };
 
-  const handleViewTypeChange = (newViewType: 'stats' | 'gameLogs' | 'passMap') => {
+  const handleViewTypeChange = (newViewType: 'stats' | 'gameLogs' | 'passMap' | 'career') => {
     setViewType(newViewType);
     
     if (newViewType === 'gameLogs' && selectedSeason) {
@@ -218,6 +218,16 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                     >
                       Game Logs
                     </button>
+                    <button
+                      onClick={() => handleViewTypeChange('career')}
+                      className={`px-3 py-1 text-sm rounded transition-colors ${
+                        viewType === 'career' 
+                          ? 'bg-blue-500 text-white' 
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      Career Stats
+                    </button>
                     {playerInfo.position === 'QB' && (
                       <button
                         onClick={() => handleViewTypeChange('passMap')}
@@ -309,22 +319,20 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                 <QBPassMap playerId={playerId} season={selectedSeason || 0} />
               )}
             </>
+          ) : viewType === 'career' ? (
+            <>
+              <h2 className="text-2xl font-bold mb-6">Career Statistics</h2>
+              <div className="overflow-x-auto">
+                <CareerStatsTable 
+                  careerStats={careerStats || []} 
+                  position={playerInfo.position} 
+                />
+              </div>
+              <div className="mt-4 text-xs text-gray-500 text-center md:hidden">
+                Scroll horizontally to view all columns
+              </div>
+            </>
           ) : null}
-        </div>
-      </div>
-
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-8">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Career Statistics</h2>
-          <div className="overflow-x-auto">
-            <CareerStatsTable 
-              careerStats={careerStats || []} 
-              position={playerInfo.position} 
-            />
-          </div>
-          <div className="mt-4 text-xs text-gray-500 text-center md:hidden">
-            Scroll horizontally to view all columns
-          </div>
         </div>
       </div>
     </div>
