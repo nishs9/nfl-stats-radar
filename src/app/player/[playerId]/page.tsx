@@ -64,12 +64,11 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   };
 
   useEffect(() => {
-    async function fetchPlayerData() {
+    async function fetchInitialPlayerData() {
       setIsLoading(true);
       setImageError(false);
       try {
-        const seasonParam = selectedSeason ? `?season=${selectedSeason}` : '';
-        const response = await fetch(`/api/player/${playerId}${seasonParam}`); 
+        const response = await fetch(`/api/player/${playerId}`); 
         
         if (!response.ok) {
           throw new Error('Failed to fetch player data');
@@ -78,8 +77,10 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         const data: PlayerDataResponse = await response.json();
         setPlayerData(data);
         
-        if (selectedSeason === null && data.seasons && data.seasons.length > 0 && !searchParams.get('season')) {
-          setSelectedSeason(data.seasons[0]);
+        // Set initial season if not already set
+        if (selectedSeason === null && data.seasons && data.seasons.length > 0) {
+          const urlSeason = searchParams.get('season');
+          setSelectedSeason(urlSeason ? Number(urlSeason) : data.seasons[0]);
         }
       } catch (err) {
         setError('Error loading player data. Please try again.');
@@ -90,9 +91,36 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
 
     if (playerId) {
-      fetchPlayerData();
+      fetchInitialPlayerData();
     }
-  }, [playerId, selectedSeason, searchParams]);
+  }, [playerId, searchParams]);
+
+  // Fetch season-specific stats when season changes
+  useEffect(() => {
+    async function fetchSeasonStats() {
+      if (!playerId || !selectedSeason || !playerData) return;
+      
+      try {
+        const response = await fetch(`/api/player/${playerId}?season=${selectedSeason}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch season stats');
+        }
+        
+        const data: PlayerDataResponse = await response.json();
+        // Only update stats and percentiles, keep everything else
+        setPlayerData(prev => prev ? {
+          ...prev,
+          stats: data.stats,
+          percentiles: data.percentiles
+        } : data);
+      } catch (err) {
+        console.error('Error fetching season stats:', err);
+      }
+    }
+
+    fetchSeasonStats();
+  }, [playerId, selectedSeason, playerData?.playerInfo]);
 
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSeason = Number(e.target.value);
