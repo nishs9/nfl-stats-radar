@@ -2,6 +2,7 @@ import sqlite3
 import pandas as pd
 import os
 import boto3
+import rpi_util
 from tqdm import tqdm
 from boto3.s3.transfer import TransferConfig
 from pathlib import Path
@@ -131,6 +132,16 @@ def create_database_online(conn: sqlite3.Connection):
         cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{table_name}_player_week ON {table_name}(player_id, season, week, team)")
         print(f"Created table {table_name} with {len(df)} rows")
 
+    # Calculate RPI data for each team and add it to the DB
+    base_url = 'https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv.gz'
+    schedule_df = pd.read_csv(base_url, compression='gzip', low_memory=False)
+    schedule_df = schedule_df[(schedule_df['season'] == 2025) & ~(schedule_df['home_score'].isna())]
+    rpi_df = rpi_util.compute_rpi_from_schedule(schedule_df, schedule_df['week'].max())
+    rpi_df["rpi_rank"] = rpi_df["comp_rpi"].rank(ascending=False).astype(int)
+    rpi_df.to_sql('rpi_data', conn, if_exists='replace', index=False)
+    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_rpi_data_team ON rpi_data(team)")
+    print(f"Created table rpi_data with {len(rpi_df)} rows")
+
     print("Online database setup complete!")
 
 def create_database(conn: sqlite3.Connection):
@@ -161,4 +172,4 @@ if __name__ == "__main__":
     create_database_online(conn)
     conn.commit()
     conn.close() 
-    #upload_db_to_r2()
+    upload_db_to_r2()

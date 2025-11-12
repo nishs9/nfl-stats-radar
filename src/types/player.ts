@@ -116,6 +116,19 @@ export interface GameLogsResponse {
   message?: string;
 }
 
+// Power Rankings / RPI types
+export interface RPIRanking {
+  team: string;
+  games_played: number;
+  win_pct: number;
+  comp_rpi: number;
+  rpi_rank: number;
+}
+
+export interface PowerRankingsResponse {
+  rankings: RPIRanking[];
+}
+
 // Pass Map types
 export interface PassMapCellStats {
   completions: number;
