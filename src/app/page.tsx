@@ -34,13 +34,13 @@ export default function Home() {
                 href="/compare"
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors"
               >
-                Compare Players
+                Player Comparison Tool
               </Link>
               <Link 
                 href="/power-rankings"
                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors"
               >
-                Power Rankings
+                NFL Power Rankings
               </Link>
             </div>
           </div>
