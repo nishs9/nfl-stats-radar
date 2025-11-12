@@ -119,6 +119,8 @@ export interface GameLogsResponse {
 // Power Rankings / RPI types
 export interface RPIRanking {
   team: string;
+  team_name: string;
+  team_logo_squared: string;
   games_played: number;
   win_pct: number;
   comp_rpi: number;

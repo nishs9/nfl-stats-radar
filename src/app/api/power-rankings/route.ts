@@ -5,11 +5,19 @@ export async function GET() {
   try {
     const db = await getDbConnection();
     
-    // Query matching the exact SQL from the screenshot
+    // Join rpi_data with teams table to get full team names and logos
     const query = `
-      SELECT team, games_played, win_pct, comp_rpi, rpi_rank 
-      FROM rpi_data 
-      ORDER BY rpi_rank
+      SELECT 
+        r.team,
+        t.team_name,
+        t.team_logo_squared,
+        r.games_played,
+        r.win_pct,
+        round(r.comp_rpi * 100, 3) as comp_rpi,
+        r.rpi_rank
+      FROM rpi_data r
+      LEFT JOIN teams t ON r.team = t.team_abbr
+      ORDER BY r.rpi_rank
     `;
 
     const rankings = await db.all(query);

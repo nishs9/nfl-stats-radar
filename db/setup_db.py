@@ -109,6 +109,12 @@ def get_play_by_play_data() -> dict[int, pd.DataFrame]:
 def create_database_online(conn: sqlite3.Connection):
     cursor = conn.cursor()
 
+    base_url = 'https://github.com/nflverse/nflverse-data/releases/download/teams/teams_colors_logos.csv.gz'
+    teams_df = pd.read_csv(base_url, compression='gzip', low_memory=False)
+    teams_df.to_sql('teams', conn, if_exists='replace', index=False)
+    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_teams ON teams(team_abbr)")
+    print(f"Created table teams with {len(teams_df)} rows")
+
     play_by_play_data_df_list = get_play_by_play_data()
     for year, df in play_by_play_data_df_list.items():
         table_name = f'play_by_play_{year}'
@@ -172,4 +178,4 @@ if __name__ == "__main__":
     create_database_online(conn)
     conn.commit()
     conn.close() 
-    upload_db_to_r2()
+    #upload_db_to_r2()
