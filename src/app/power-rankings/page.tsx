@@ -109,17 +109,16 @@ export default function PowerRankingsPage() {
         </button>
         
         <h1 className="text-3xl font-bold mb-2">NFL Power Rankings</h1>
-        <p className="text-gray-600">Based on Relative Performance Index (RPI) for current season</p>
+        <p className="text-gray-600">Weekly rankings based on Composite Relative Performance Index (Composite RPI) for the 2025 season</p>
       </div>
 
       {/* Info Section */}
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="text-sm font-semibold text-blue-900 mb-2">About RPI Rankings</h3>
         <p className="text-xs text-blue-800">
-          <a href="https://en.wikipedia.org/wiki/Relative_performance_index" target="_blank" rel="noopener noreferrer">Relative Performance Index (RPI)</a> 
-           is a metric that is used  to rank teams based on record and strength of schedule. Composite RPI is my 
-          own version of RPI that takes recent form and margin of victory into account. These rankings 
-          will be updated weekly. Click on column headers to sort by different metrics.
+          <a href="https://en.wikipedia.org/wiki/Relative_performance_index" target="_blank" rel="noopener noreferrer">Relative Performance Index (RPI) </a> 
+        is a metric that is used to rank teams based on record and strength of schedule. Composite RPI is my own version of RPI that takes recent form and margin 
+        of victory into account along with record and strength of schedule. These rankings will be updated weekly.
         </p>
       </div>
 
