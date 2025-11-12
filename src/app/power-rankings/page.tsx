@@ -163,7 +163,7 @@ export default function PowerRankingsPage() {
                   onClick={() => handleSort('rpi_rank')}
                 >
                   <div className="flex items-center">
-                    RPI Rank
+                    Power Ranking
                     <SortIcon column="rpi_rank" />
                   </div>
                 </th>
