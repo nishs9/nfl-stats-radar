@@ -32,13 +32,13 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/compare"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors whitespace-nowrap"
               >
                 Player Comparison Tool
               </Link>
               <Link 
                 href="/power-rankings"
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors"
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors whitespace-nowrap"
               >
                 NFL Power Rankings
               </Link>
