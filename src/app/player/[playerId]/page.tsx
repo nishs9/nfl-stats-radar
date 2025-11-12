@@ -14,8 +14,9 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
+  const [loadedSeason, setLoadedSeason] = useState<number | null>(null);
   const [imageError, setImageError] = useState(false);
-  const [viewType, setViewType] = useState<'stats' | 'gameLogs' | 'passMap'>('stats');
+  const [viewType, setViewType] = useState<'stats' | 'gameLogs' | 'passMap' | 'career'>('stats');
   const [gameLogsData, setGameLogsData] = useState<GameLogsResponse | null>(null);
   const [gameLogsLoading, setGameLogsLoading] = useState(false);
   const [gameLogsError, setGameLogsError] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
   };
 
-  const handleViewTypeChange = (newViewType: 'stats' | 'gameLogs' | 'passMap') => {
+  const handleViewTypeChange = (newViewType: 'stats' | 'gameLogs' | 'passMap' | 'career') => {
     setViewType(newViewType);
     
     if (newViewType === 'gameLogs' && selectedSeason) {
@@ -64,12 +65,11 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
   };
 
   useEffect(() => {
-    async function fetchPlayerData() {
+    async function fetchInitialPlayerData() {
       setIsLoading(true);
       setImageError(false);
       try {
-        const seasonParam = selectedSeason ? `?season=${selectedSeason}` : '';
-        const response = await fetch(`/api/player/${playerId}${seasonParam}`); 
+        const response = await fetch(`/api/player/${playerId}`); 
         
         if (!response.ok) {
           throw new Error('Failed to fetch player data');
@@ -78,8 +78,16 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
         const data: PlayerDataResponse = await response.json();
         setPlayerData(data);
         
-        if (selectedSeason === null && data.seasons && data.seasons.length > 0 && !searchParams.get('season')) {
-          setSelectedSeason(data.seasons[0]);
+        // Set initial season if not already set
+        if (selectedSeason === null && data.seasons && data.seasons.length > 0) {
+          const urlSeason = searchParams.get('season');
+          const initialSeason = urlSeason ? Number(urlSeason) : data.seasons[0];
+          setSelectedSeason(initialSeason);
+          // Only mark as loaded if we got stats for the season we actually selected
+          // API returns first season's stats, so only mark loaded if no URL season or if it matches first season
+          if (!urlSeason || initialSeason === data.seasons[0]) {
+            setLoadedSeason(initialSeason);
+          }
         }
       } catch (err) {
         setError('Error loading player data. Please try again.');
@@ -90,9 +98,40 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
 
     if (playerId) {
-      fetchPlayerData();
+      fetchInitialPlayerData();
     }
-  }, [playerId, selectedSeason, searchParams]);
+  }, [playerId, searchParams]);
+
+  // Fetch season-specific stats when season changes
+  useEffect(() => {
+    async function fetchSeasonStats() {
+      if (!playerId || !selectedSeason || !playerData) return;
+      
+      // Only fetch if we haven't loaded this season yet
+      if (loadedSeason === selectedSeason) return;
+      
+      try {
+        const response = await fetch(`/api/player/${playerId}?season=${selectedSeason}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch season stats');
+        }
+        
+        const data: PlayerDataResponse = await response.json();
+        // Only update stats and percentiles, keep everything else
+        setPlayerData(prev => prev ? {
+          ...prev,
+          stats: data.stats,
+          percentiles: data.percentiles
+        } : data);
+        setLoadedSeason(selectedSeason);
+      } catch (err) {
+        console.error('Error fetching season stats:', err);
+      }
+    }
+
+    fetchSeasonStats();
+  }, [playerId, selectedSeason, loadedSeason]);
 
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSeason = Number(e.target.value);
@@ -138,7 +177,6 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
 
   const { playerInfo, seasons, stats, percentiles, careerStats } = playerData;
   const statDefinitions = getStatsForPosition(playerInfo.position); 
-  const fallbackSrc = getDefaultImageUrl();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -163,10 +201,10 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
             <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0 mb-4 md:mb-0 md:mr-6 bg-gray-700">
               <Image 
                 // TODO: Figure out whether there is a copyright compliant way to get the headshot image
-                src={fallbackSrc}
+                src={!imageError && playerInfo?.headshot_url ? playerInfo.headshot_url : getDefaultImageUrl()}
                 alt={playerInfo.player_display_name}
-                layout="fill" 
-                objectFit="cover" 
+                fill
+                style={{ objectFit: 'cover' }}
                 onError={() => {
                   if (!imageError) setImageError(true); 
                 }}
@@ -217,6 +255,16 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                       }`}
                     >
                       Game Logs
+                    </button>
+                    <button
+                      onClick={() => handleViewTypeChange('career')}
+                      className={`px-3 py-1 text-sm rounded transition-colors ${
+                        viewType === 'career' 
+                          ? 'bg-blue-500 text-white' 
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      Career Stats
                     </button>
                     {playerInfo.position === 'QB' && (
                       <button
@@ -309,22 +357,20 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                 <QBPassMap playerId={playerId} season={selectedSeason || 0} />
               )}
             </>
+          ) : viewType === 'career' ? (
+            <>
+              <h2 className="text-2xl font-bold mb-6">Career Statistics</h2>
+              <div className="overflow-x-auto">
+                <CareerStatsTable 
+                  careerStats={careerStats || []} 
+                  position={playerInfo.position} 
+                />
+              </div>
+              <div className="mt-4 text-xs text-gray-500 text-center md:hidden">
+                Scroll horizontally to view all columns
+              </div>
+            </>
           ) : null}
-        </div>
-      </div>
-
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden mt-8">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Career Statistics</h2>
-          <div className="overflow-x-auto">
-            <CareerStatsTable 
-              careerStats={careerStats || []} 
-              position={playerInfo.position} 
-            />
-          </div>
-          <div className="mt-4 text-xs text-gray-500 text-center md:hidden">
-            Scroll horizontally to view all columns
-          </div>
         </div>
       </div>
     </div>

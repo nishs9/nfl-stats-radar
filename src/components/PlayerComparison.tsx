@@ -22,12 +22,14 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   const [leftImageError, setLeftImageError] = useState(false);
   const [selectedLeftPlayer, setSelectedLeftPlayer] = useState<Player | null>(null);
   const [showLeftPlayerSearch, setShowLeftPlayerSearch] = useState(!initialLeftPlayer);
+  const [leftLoadedSeason, setLeftLoadedSeason] = useState<number | null>(null);
   
   // Right player state
   const [rightPlayerData, setRightPlayerData] = useState<PlayerDataResponse | null>(null);
   const [rightSelectedSeason, setRightSelectedSeason] = useState<number | null>(null);
   const [rightImageError, setRightImageError] = useState(false);
   const [selectedRightPlayer, setSelectedRightPlayer] = useState<Player | null>(null);
+  const [rightLoadedSeason, setRightLoadedSeason] = useState<number | null>(null);
   
   // UI state
   const [isLoading, setIsLoading] = useState(!!initialLeftPlayer);
@@ -36,23 +38,22 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   
   const router = useRouter();
 
-  // Reusable function to fetch player data
-  const fetchPlayerData = async (
+  const fetchInitialPlayerData = async (
     playerId: string,
-    season: number | null,
     setPlayerData: (data: PlayerDataResponse | null) => void,
     setImageError: (error: boolean) => void,
     setSelectedSeason: (season: number) => void,
-    isInitial = false
+    setLoadedSeason: (season: number) => void,
+    initialSeason: number | null = null,
+    isLeftPlayer = false
   ) => {
-    if (isInitial) {
+    if (isLeftPlayer) {
       setIsLoading(true);
     }
     setImageError(false);
     
     try {
-      const seasonParam = season ? `?season=${season}` : '';
-      const response = await fetch(`/api/player/${playerId}${seasonParam}`);
+      const response = await fetch(`/api/player/${playerId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch player data');
@@ -61,19 +62,55 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
       const data: PlayerDataResponse = await response.json();
       setPlayerData(data);
       
-      // Set default season if none specified
-      if (season === null && data.seasons && data.seasons.length > 0) {
-        setSelectedSeason(data.seasons[0]);
+      // Set default season
+      if (data.seasons && data.seasons.length > 0) {
+        const selectedSeasonValue = initialSeason || data.seasons[0];
+        setSelectedSeason(selectedSeasonValue);
+        // Only mark as loaded if we got stats for the season we actually selected
+        // API returns first season's stats, so only mark loaded if no initialSeason or if it matches first season
+        if (!initialSeason || initialSeason === data.seasons[0]) {
+          setLoadedSeason(selectedSeasonValue);
+        }
       }
     } catch (err) {
-      if (isInitial) {
+      if (isLeftPlayer) {
         setError('Error loading player data. Please try again.');
       }
       console.error(`Error fetching player data for ${playerId}:`, err);
     } finally {
-      if (isInitial) {
+      if (isLeftPlayer) {
         setIsLoading(false);
       }
+    }
+  };
+
+  // Fetch season-specific stats
+  const fetchSeasonStats = async (
+    playerId: string,
+    season: number,
+    setPlayerData: (data: PlayerDataResponse | null) => void,
+    setLoadedSeason: (season: number) => void,
+    currentData: PlayerDataResponse | null
+  ) => {
+    if (!currentData) return;
+    
+    try {
+      const response = await fetch(`/api/player/${playerId}?season=${season}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch season stats');
+      }
+      
+      const data: PlayerDataResponse = await response.json();
+      // Only update stats and percentiles
+      setPlayerData({
+        ...currentData,
+        stats: data.stats,
+        percentiles: data.percentiles
+      });
+      setLoadedSeason(season);
+    } catch (err) {
+      console.error(`Error fetching season stats for ${playerId}:`, err);
     }
   };
 
@@ -81,47 +118,71 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
   useEffect(() => {
     if (!initialLeftPlayer) return;
 
-    fetchPlayerData(
+    fetchInitialPlayerData(
       initialLeftPlayer.playerId,
-      leftSelectedSeason,
       setLeftPlayerData,
       setLeftImageError,
       setLeftSelectedSeason,
+      setLeftLoadedSeason,
+      initialLeftPlayer.season || null,
       true
     );
-  }, [initialLeftPlayer, leftSelectedSeason]);
+  }, [initialLeftPlayer?.playerId]);
+
+  // Fetch season stats when left player season changes
+  useEffect(() => {
+    const playerId = initialLeftPlayer?.playerId || selectedLeftPlayer?.player_id;
+    if (!playerId || !leftSelectedSeason || !leftPlayerData) return;
+    
+    // Only fetch if we haven't loaded this season yet
+    if (leftLoadedSeason === leftSelectedSeason) return;
+
+    fetchSeasonStats(playerId, leftSelectedSeason, setLeftPlayerData, setLeftLoadedSeason, leftPlayerData);
+  }, [leftSelectedSeason, initialLeftPlayer, selectedLeftPlayer, leftLoadedSeason, leftPlayerData]);
 
   // Fetch left player data when manually selected
   useEffect(() => {
     if (!selectedLeftPlayer) {
       setLeftPlayerData(null);
+      setLeftLoadedSeason(null);
       return;
     }
 
-    fetchPlayerData(
+    fetchInitialPlayerData(
       selectedLeftPlayer.player_id,
-      leftSelectedSeason,
       setLeftPlayerData,
       setLeftImageError,
-      setLeftSelectedSeason
+      setLeftSelectedSeason,
+      setLeftLoadedSeason
     );
-  }, [selectedLeftPlayer, leftSelectedSeason]);
+  }, [selectedLeftPlayer?.player_id]);
 
   // Fetch right player data when selected
   useEffect(() => {
     if (!selectedRightPlayer) {
       setRightPlayerData(null);
+      setRightLoadedSeason(null);
       return;
     }
 
-    fetchPlayerData(
+    fetchInitialPlayerData(
       selectedRightPlayer.player_id,
-      rightSelectedSeason,
       setRightPlayerData,
       setRightImageError,
-      setRightSelectedSeason
+      setRightSelectedSeason,
+      setRightLoadedSeason
     );
-  }, [selectedRightPlayer, rightSelectedSeason]);
+  }, [selectedRightPlayer?.player_id]);
+
+  // Fetch season stats when right player season changes
+  useEffect(() => {
+    if (!selectedRightPlayer || !rightSelectedSeason || !rightPlayerData) return;
+    
+    // Only fetch if we haven't loaded this season yet
+    if (rightLoadedSeason === rightSelectedSeason) return;
+
+    fetchSeasonStats(selectedRightPlayer.player_id, rightSelectedSeason, setRightPlayerData, setRightLoadedSeason, rightPlayerData);
+  }, [rightSelectedSeason, selectedRightPlayer, rightLoadedSeason, rightPlayerData]);
 
   const handleLeftSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLeftSelectedSeason(Number(e.target.value));
@@ -359,7 +420,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
                   <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0 mb-4 bg-gray-700">
                     <Image 
                     // TODO: Figure out whether there is a copyright compliant way to get the headshot image
-                      src={getDefaultImageUrl()}
+                      src={!rightImageError && rightPlayerInfo?.headshot_url ? rightPlayerInfo.headshot_url : getDefaultImageUrl()}
                       alt={rightPlayerInfo?.player_display_name || ''}
                       fill
                       style={{ objectFit: 'cover' }}
