@@ -113,11 +113,11 @@ export async function GET(
 
     const seasonYear = Number(season);
 
-    // Validate season is 2015 or later
-    if (seasonYear < 2015) {
+    // Validate season is 2010 or later
+    if (seasonYear < 2010) {
       return NextResponse.json({ 
-        error: 'Pass map data is only available from 2015 onwards',
-        isPre2015: true
+        error: 'Pass map data is only available from 2010 onwards',
+        isPre2010: true
       }, { status: 400 });
     }
 
