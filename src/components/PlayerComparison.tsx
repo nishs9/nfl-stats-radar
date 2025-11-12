@@ -138,7 +138,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     if (leftLoadedSeason === leftSelectedSeason) return;
 
     fetchSeasonStats(playerId, leftSelectedSeason, setLeftPlayerData, setLeftLoadedSeason, leftPlayerData);
-  }, [leftSelectedSeason, initialLeftPlayer, selectedLeftPlayer, leftLoadedSeason]);
+  }, [leftSelectedSeason, initialLeftPlayer, selectedLeftPlayer, leftLoadedSeason, leftPlayerData]);
 
   // Fetch left player data when manually selected
   useEffect(() => {
@@ -182,7 +182,7 @@ export default function PlayerComparison({ initialLeftPlayer }: PlayerComparison
     if (rightLoadedSeason === rightSelectedSeason) return;
 
     fetchSeasonStats(selectedRightPlayer.player_id, rightSelectedSeason, setRightPlayerData, setRightLoadedSeason, rightPlayerData);
-  }, [rightSelectedSeason, selectedRightPlayer, rightLoadedSeason]);
+  }, [rightSelectedSeason, selectedRightPlayer, rightLoadedSeason, rightPlayerData]);
 
   const handleLeftSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLeftSelectedSeason(Number(e.target.value));

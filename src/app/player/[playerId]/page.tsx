@@ -131,7 +131,7 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
     }
 
     fetchSeasonStats();
-  }, [playerId, selectedSeason, playerData, loadedSeason]);
+  }, [playerId, selectedSeason, loadedSeason]);
 
   const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSeason = Number(e.target.value);
