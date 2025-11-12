@@ -68,8 +68,8 @@ export default function PassMapComparison({
         return;
       }
 
-      if (selectedLeftSeason < 2015) {
-        setErrorLeft('Pass map data only available from 2015 onwards');
+      if (selectedLeftSeason < 2010) {
+        setErrorLeft('Pass map data only available from 2010 onwards');
         setIsLoadingLeft(false);
         return;
       }
@@ -106,8 +106,8 @@ export default function PassMapComparison({
         return;
       }
 
-      if (selectedRightSeason < 2015) {
-        setErrorRight('Pass map data only available from 2015 onwards');
+      if (selectedRightSeason < 2010) {
+        setErrorRight('Pass map data only available from 2010 onwards');
         setIsLoadingRight(false);
         return;
       }
@@ -306,7 +306,7 @@ export default function PassMapComparison({
         <div className="text-sm text-blue-900">
           <p className="font-semibold mb-2">QB Pass Map Comparison Info</p>
           <ul className="list-disc list-inside space-y-1 text-xs">
-            <li>Pass map comparison is only available for QBs from 2015 onwards</li>
+            <li>Pass map comparison is only available for QBs from 0 onwards</li>
             <li>Cell colors represent completion percentage: red (low) → yellow (mid) → green (high)</li>
             <li>Use the stat selector above to customize which statistics are displayed in both pass maps</li>
           </ul>

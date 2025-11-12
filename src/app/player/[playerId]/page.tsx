@@ -103,8 +103,8 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
       fetchGameLogs(newSeason);
     }
     
-    // If we're showing pass map and switching to pre-2015, switch to stats view
-    if (viewType === 'passMap' && newSeason < 2015) {
+    // If we're showing pass map and switching to pre-2010, switch to stats view
+    if (viewType === 'passMap' && newSeason < 2010) {
       setViewType('stats');
     }
   };
@@ -221,15 +221,15 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
                     {playerInfo.position === 'QB' && (
                       <button
                         onClick={() => handleViewTypeChange('passMap')}
-                        disabled={selectedSeason !== null && selectedSeason < 2015}
+                        disabled={selectedSeason !== null && selectedSeason < 2010}
                         className={`px-3 py-1 text-sm rounded transition-colors ${
                           viewType === 'passMap' 
                             ? 'bg-blue-500 text-white' 
-                            : selectedSeason !== null && selectedSeason < 2015
+                            : selectedSeason !== null && selectedSeason < 2010
                             ? 'text-gray-500 cursor-not-allowed'
                             : 'text-gray-300 hover:text-white'
                         }`}
-                        title={selectedSeason !== null && selectedSeason < 2015 ? 'QB Pass Maps are only available from 2015 onwards' : ''}
+                        title={selectedSeason !== null && selectedSeason < 2010 ? 'QB Pass Maps are only available from 2010 onwards' : ''}
                       >
                         Pass Map
                       </button>
@@ -301,9 +301,9 @@ export default function PlayerPage({params}: {params: Promise<{ playerId: string
             <>
               <h2 className="text-2xl font-bold mb-6">Pass Map for {selectedSeason}</h2>
               
-              {selectedSeason && selectedSeason < 2015 ? (
+              {selectedSeason && selectedSeason < 2010 ? (
                 <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
-                  Pass map data is only available from 2015 onwards. Please select a more recent season.
+                  Pass map data is only available from 2010 onwards. Please select a more recent season.
                 </div>
               ) : (
                 <QBPassMap playerId={playerId} season={selectedSeason || 0} />
