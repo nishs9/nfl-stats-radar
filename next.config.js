@@ -16,6 +16,19 @@ const nextConfig = {
         hostname: 'via.placeholder.com',
         port: '',
         pathname: '/**', 
+      },
+      // Allow GitHub images for team logos
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
