@@ -20,6 +20,20 @@ interface ScatterPlotProps {
   showNames?: boolean;
 }
 
+// Helper function to escape HTML characters to prevent XSS
+function escapeHtml(text: string | number | null | undefined): string {
+  if (text === null || text === undefined) return '';
+  const str = String(text);
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return str.replace(/[&<>"']/g, (m) => map[m]);
+}
+
 export default function ScatterPlot({
   dataPoints,
   xStat,
@@ -177,13 +191,16 @@ export default function ScatterPlot({
           .attr('r', 6)
           .attr('opacity', 1);
 
+        const xStatLabel = escapeHtml(xStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+        const yStatLabel = escapeHtml(yStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+        
         tooltip
           .style('opacity', 1)
           .html(`
-            <strong>${d.playerName}</strong><br/>
-            ${d.position} - ${d.team}<br/>
-            ${xStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${d.xValue?.toLocaleString()}<br/>
-            ${yStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${d.yValue?.toLocaleString()}
+            <strong>${escapeHtml(d.playerName)}</strong><br/>
+            ${escapeHtml(d.position)} - ${escapeHtml(d.team)}<br/>
+            ${xStatLabel}: ${escapeHtml(d.xValue?.toLocaleString())}<br/>
+            ${yStatLabel}: ${escapeHtml(d.yValue?.toLocaleString())}
           `);
       })
       .on('mousemove', function(event) {
