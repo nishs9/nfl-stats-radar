@@ -42,6 +42,12 @@ export default function Home() {
               >
                 NFL Power Rankings
               </Link>
+              <Link 
+                href="/scatter-plot"
+                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-lg inline-flex items-center justify-center transition-colors whitespace-nowrap"
+              >
+                Stats Scatter Plot
+              </Link>
             </div>
           </div>
         </div>
