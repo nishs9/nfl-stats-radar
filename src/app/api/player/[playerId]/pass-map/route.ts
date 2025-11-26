@@ -102,6 +102,8 @@ export async function GET(
     const playerId = full_params.playerId;
     const searchParams = request.nextUrl.searchParams;
     const season = searchParams.get('season');
+    const weekStart = searchParams.get('weekStart');
+    const weekEnd = searchParams.get('weekEnd');
 
     if (!playerId) {
       return NextResponse.json({ error: 'Player ID is required' }, { status: 400 });
@@ -112,6 +114,38 @@ export async function GET(
     }
 
     const seasonYear = Number(season);
+    
+    // Validate week range if provided
+    let weekStartNum: number | null = null;
+    let weekEndNum: number | null = null;
+    
+    if (weekStart) {
+      weekStartNum = Number(weekStart);
+      if (isNaN(weekStartNum) || weekStartNum < 1 || weekStartNum > 18) {
+        return NextResponse.json({ 
+          error: 'weekStart must be a number between 1 and 18',
+          isInvalidWeekRange: true
+        }, { status: 400 });
+      }
+    }
+    
+    if (weekEnd) {
+      weekEndNum = Number(weekEnd);
+      if (isNaN(weekEndNum) || weekEndNum < 1 || weekEndNum > 18) {
+        return NextResponse.json({ 
+          error: 'weekEnd must be a number between 1 and 18',
+          isInvalidWeekRange: true
+        }, { status: 400 });
+      }
+    }
+    
+    // Validate that weekStart <= weekEnd if both are provided
+    if (weekStartNum !== null && weekEndNum !== null && weekStartNum > weekEndNum) {
+      return NextResponse.json({ 
+        error: 'weekStart must be less than or equal to weekEnd',
+        isInvalidWeekRange: true
+      }, { status: 400 });
+    }
 
     // Validate season is 2010 or later
     if (seasonYear < 2010) {
@@ -152,6 +186,29 @@ export async function GET(
       }, { status: 500 });
     }
 
+    // Build WHERE clause with optional week filtering
+    const whereConditions = [
+      "play_type = 'pass'",
+      "passer_player_id = ?",
+      "season_type = 'REG'",
+      "pass_location IS NOT NULL",
+      "air_yards IS NOT NULL"
+    ];
+    
+    const queryParams: (string | number)[] = [playerId];
+    
+    // Add week filtering if provided
+    if (weekStartNum !== null && weekEndNum !== null) {
+      whereConditions.push("week >= ? AND week <= ?");
+      queryParams.push(weekStartNum, weekEndNum);
+    } else if (weekStartNum !== null) {
+      whereConditions.push("week >= ?");
+      queryParams.push(weekStartNum);
+    } else if (weekEndNum !== null) {
+      whereConditions.push("week <= ?");
+      queryParams.push(weekEndNum);
+    }
+    
     // Query with aggregations done in SQL
     const query = `
       SELECT 
@@ -171,18 +228,14 @@ export async function GET(
         SUM(CASE WHEN pass_touchdown = 1 THEN 1 ELSE 0 END) as touchdowns,
         SUM(CASE WHEN interception = 1 THEN 1 ELSE 0 END) as interceptions
       FROM play_by_play_${seasonYear}
-      WHERE play_type = 'pass'
-        AND passer_player_id = ?
-        AND season_type = 'REG'
-        AND pass_location IS NOT NULL
-        AND air_yards IS NOT NULL
+      WHERE ${whereConditions.join(' AND ')}
       GROUP BY distance_category, location_category
     `;
 
     let aggregatedRows: AggregatedRow[];
     
     try {
-      aggregatedRows = await db.all(query, [playerId]) as AggregatedRow[];
+      aggregatedRows = await db.all(query, queryParams) as AggregatedRow[];
     } catch (queryError) {
       console.error('Query error:', queryError);
       return NextResponse.json({
@@ -200,7 +253,9 @@ export async function GET(
     return NextResponse.json({
       passMapData,
       season: seasonYear,
-      totalPlays
+      totalPlays,
+      weekStart: weekStartNum,
+      weekEnd: weekEndNum
     });
 
   } catch (error) {

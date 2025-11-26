@@ -38,6 +38,8 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
     'touchdowns',
     'interceptions'
   ]);
+  const [weekStart, setWeekStart] = useState<number | null>(null);
+  const [weekEnd, setWeekEnd] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchPassMapData() {
@@ -58,7 +60,16 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
       setError(null);
 
       try {
-        const response = await fetch(`/api/player/${playerId}/pass-map?season=${season}`, {
+        // Build query string with optional week parameters
+        const queryParams = new URLSearchParams({ season: season.toString() });
+        if (weekStart !== null) {
+          queryParams.append('weekStart', weekStart.toString());
+        }
+        if (weekEnd !== null) {
+          queryParams.append('weekEnd', weekEnd.toString());
+        }
+        
+        const response = await fetch(`/api/player/${playerId}/pass-map?${queryParams.toString()}`, {
           signal: AbortSignal.timeout(30000), // 30 second timeout
         });
 
@@ -76,6 +87,10 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
           
           if (errorData.isFuture) {
             throw new Error('Pass map data is not available for future seasons.');
+          }
+          
+          if (errorData.isInvalidWeekRange) {
+            throw new Error(errorData.error || 'Invalid week range specified.');
           }
           
           throw new Error(errorData.error || 'Failed to fetch pass map data');
@@ -108,7 +123,7 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
     }
 
     fetchPassMapData();
-  }, [playerId, season]);
+  }, [playerId, season, weekStart, weekEnd]);
 
   const handleStatsChange = (newStats: string[]) => {
     setSelectedStats(newStats);
@@ -156,8 +171,107 @@ export default function QBPassMap({ playerId, season }: QBPassMapProps) {
     );
   }
 
+  const handleWeekStartChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const newWeekStart = value === '' ? null : Number(value);
+    
+    // Validate that weekStart <= weekEnd if both are set
+    if (newWeekStart !== null && weekEnd !== null && newWeekStart > weekEnd) {
+      setError('Start week must be less than or equal to end week.');
+      return;
+    }
+    
+    setError(null);
+    setWeekStart(newWeekStart);
+  };
+
+  const handleWeekEndChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const newWeekEnd = value === '' ? null : Number(value);
+    
+    // Validate that weekStart <= weekEnd if both are set
+    if (weekStart !== null && newWeekEnd !== null && weekStart > newWeekEnd) {
+      setError('Start week must be less than or equal to end week.');
+      return;
+    }
+    
+    setError(null);
+    setWeekEnd(newWeekEnd);
+  };
+
+  const clearWeekFilter = () => {
+    setWeekStart(null);
+    setWeekEnd(null);
+    setError(null); // Clear any validation errors
+  };
+
+  const weekOptions = Array.from({ length: 18 }, (_, i) => i + 1);
+
   return (
     <div className="space-y-6">
+      {/* Week Range Filter */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="flex flex-col md:flex-row md:items-end gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter by Week Range (Optional)
+            </label>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <label htmlFor="weekStart" className="block text-xs text-gray-600 mb-1">
+                  Start Week
+                </label>
+                <select
+                  id="weekStart"
+                  value={weekStart || ''}
+                  onChange={handleWeekStartChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                  <option value="">All Weeks</option>
+                  {weekOptions.map(week => (
+                    <option key={week} value={week}>Week {week}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="text-gray-500 pt-6">to</div>
+              <div className="flex-1">
+                <label htmlFor="weekEnd" className="block text-xs text-gray-600 mb-1">
+                  End Week
+                </label>
+                <select
+                  id="weekEnd"
+                  value={weekEnd || ''}
+                  onChange={handleWeekEndChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                  <option value="">All Weeks</option>
+                  {weekOptions.map(week => (
+                    <option key={week} value={week}>Week {week}</option>
+                  ))}
+                </select>
+              </div>
+              {(weekStart !== null || weekEnd !== null) && (
+                <button
+                  onClick={clearWeekFilter}
+                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            {(weekStart !== null || weekEnd !== null) && (
+              <p className="mt-2 text-xs text-gray-600">
+                Showing data for {weekStart !== null && weekEnd !== null 
+                  ? `Weeks ${weekStart}-${weekEnd}`
+                  : weekStart !== null 
+                    ? `Week ${weekStart} onwards`
+                    : `Weeks 1-${weekEnd}`}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Stat Selector */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <PassMapStatSelector 
