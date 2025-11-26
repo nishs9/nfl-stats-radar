@@ -110,14 +110,15 @@ export default function PowerRankingsPage() {
         </button>
         
         <h1 className="text-3xl font-bold mb-2">NFL Power Rankings</h1>
-        <p className="text-gray-600">Power rankings based on Composite Relative Performance Index (Composite RPI) for the 2025 season</p>
+        <p className="text-gray-600">Power rankings based on Composite Rating Percentage Index (Composite RPI) for the 2025 season</p>
       </div>
 
       {/* Info Section */}
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="text-base font-semibold text-blue-900 mb-2">About Power Rankings</h3>
         <p className="text-sm text-blue-800">
-          Composite RPI is my own version of <a href="https://en.wikipedia.org/wiki/Rating_percentage_index" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600">Rating Percentage Index (RPI)</a> that takes recent form and margin of victory into account along with record and strength of schedule. A higher Composite RPI is indicative of a stronger team. These rankings will be updated weekly.
+          Composite RPI is my own version of <a href="https://en.wikipedia.org/wiki/Rating_percentage_index" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600">Rating Percentage Index (RPI)</a> that 
+          takes recent form and margin of victory into account along with record and strength of schedule. A higher Composite RPI indicates a stronger team. These rankings will be updated weekly.
         </p>
       </div>
 
