@@ -31,11 +31,13 @@ export default function RootLayout({
             </a>
           </div>
         </footer>
-        <Script
-          src="https://umami-production-5177.up.railway.app/script.js"
-          data-website-id="fc97f645-3c6e-4cc9-9e24-32f90433fa9e"
-          strategy="afterInteractive"
-        />
+        {process.env.NEXT_PUBLIC_UMAMI_URL && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID && (
+          <Script
+            src={process.env.NEXT_PUBLIC_UMAMI_URL}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );
