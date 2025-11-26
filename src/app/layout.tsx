@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -30,6 +31,11 @@ export default function RootLayout({
             </a>
           </div>
         </footer>
+        <Script
+          src="https://umami-production-5177.up.railway.app/script.js"
+          data-website-id="fc97f645-3c6e-4cc9-9e24-32f90433fa9e"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
