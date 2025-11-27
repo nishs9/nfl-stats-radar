@@ -208,7 +208,7 @@ export async function GET(
       whereConditions.push("week <= ?");
       queryParams.push(weekEndNum);
     }
-    
+
     // Query with aggregations done in SQL
     const query = `
       SELECT 

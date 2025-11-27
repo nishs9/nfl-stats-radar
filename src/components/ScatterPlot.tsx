@@ -53,7 +53,7 @@ export default function ScatterPlot({
     // Clear any previous chart
     d3.select(svgRef.current).selectAll('*').remove();
 
-    const margin = { top: 40, right: 20, bottom: 60, left: 20 };
+    const margin = { top: 40, right: 40, bottom: 60, left: 40 };
     const containerWidth = containerRef.current?.clientWidth || 800;
     const containerHeight = containerRef.current?.clientHeight || 600;
     const width = Math.min(containerWidth - margin.left - margin.right, 1200);
@@ -94,6 +94,11 @@ export default function ScatterPlot({
       .range([height, 0])
       .nice();
 
+    const positions = Array.from(new Set(validData.map(d => d.position)));
+    const colorScale = d3.scaleOrdinal<string>()
+      .domain(positions)
+      .range(d3.schemeCategory10);
+
     const xTicks = xScale.ticks();
     const yTicks = yScale.ticks();
 
@@ -126,6 +131,7 @@ export default function ScatterPlot({
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
 
+    // Set up x-axis labels
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(xAxis)
@@ -137,17 +143,15 @@ export default function ScatterPlot({
       .attr('text-anchor', 'middle')
       .attr('font-size', '12px')
       .attr('font-weight', 'bold')
-      .text(xStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+      .text(xStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));   
 
+    // Set up y-axis labels
     svg.append('g')
       .call(yAxis)
-      .call(g => g.select('.domain').attr('stroke', '#e5e5e5'));
-
-    // Add y-axis label separately (not appended to axis group to avoid clipping)
-    svg.append('text')
-      .attr('transform', `rotate(-90)`)
-      .attr('y', -45)
-      .attr('x', -height / 2)
+      .call(g => g.select('.domain').attr('stroke', '#e5e5e5'))
+      .append('text')
+      .attr('x', width / 15)
+      .attr('y', -height / 20)
       .attr('fill', '#333')
       .attr('text-anchor', 'middle')
       .attr('font-size', '12px')
@@ -162,8 +166,8 @@ export default function ScatterPlot({
       .attr('cx', d => xScale(d.xValue as number))
       .attr('cy', d => yScale(d.yValue as number))
       .attr('r', 6)
-      .attr('fill', '#3b82f6')
-      .attr('stroke', '#2563eb')
+      .attr('fill', d => colorScale(d.position))
+      .attr('stroke', '#fff')
       .attr('stroke-width', 1)
       .style('cursor', 'pointer')
       .on('click', (event, d) => {
@@ -243,6 +247,28 @@ export default function ScatterPlot({
 
         tooltip.style('visibility', 'hidden');
       });
+
+    const legend = svg.append('g')
+      .attr('transform', `translate(${width - 100}, 20)`);
+
+    const legendItems = legend.selectAll('.legend-item')
+      .data(positions)
+      .join('g')
+      .attr('class', 'legend-item')
+      .attr('transform', (d, i) => `translate(0, ${i * 20})`);
+
+    legendItems.append('circle')
+      .attr('r', 4)
+      .attr('fill', d => colorScale(d))
+      .attr('cx', 0)
+      .attr('cy', 0);
+
+    legendItems.append('text')
+      .attr('x', 8)
+      .attr('y', 4)
+      .attr('font-size', '11px')
+      .attr('fill', '#333')
+      .text(d => d);
 
     if (showNames) {
       const labelGroup = svg.append('g')
