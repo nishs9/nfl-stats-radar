@@ -49,6 +49,10 @@ export default function PassMapComparison({
   const [errorRight, setErrorRight] = useState<string | null>(null);
   const [selectedLeftSeason, setSelectedLeftSeason] = useState<number>(leftSeason);
   const [selectedRightSeason, setSelectedRightSeason] = useState<number>(rightSeason);
+  const [leftWeekStart, setLeftWeekStart] = useState<number | null>(null);
+  const [leftWeekEnd, setLeftWeekEnd] = useState<number | null>(null);
+  const [rightWeekStart, setRightWeekStart] = useState<number | null>(null);
+  const [rightWeekEnd, setRightWeekEnd] = useState<number | null>(null);
   const [selectedStats, setSelectedStats] = useState<string[]>([
     'completions',
     'completionPct',
@@ -78,10 +82,24 @@ export default function PassMapComparison({
       setErrorLeft(null);
 
       try {
-        const response = await fetch(`/api/player/${leftPlayerId}/pass-map?season=${selectedLeftSeason}`);
+        // Build query string with optional week parameters
+        const queryParams = new URLSearchParams({ season: selectedLeftSeason.toString() });
+        if (leftWeekStart !== null) {
+          queryParams.append('weekStart', leftWeekStart.toString());
+        }
+        if (leftWeekEnd !== null) {
+          queryParams.append('weekEnd', leftWeekEnd.toString());
+        }
+        
+        const response = await fetch(`/api/player/${leftPlayerId}/pass-map?${queryParams.toString()}`);
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Failed to fetch pass map data' }));
+          
+          if (errorData.isInvalidWeekRange) {
+            throw new Error(errorData.error || 'Invalid week range specified.');
+          }
+          
           throw new Error(errorData.error || 'Failed to fetch pass map data');
         }
 
@@ -95,7 +113,7 @@ export default function PassMapComparison({
     }
 
     fetchLeftPassMap();
-  }, [leftPlayerId, selectedLeftSeason]);
+  }, [leftPlayerId, selectedLeftSeason, leftWeekStart, leftWeekEnd]);
 
   // Fetch right player pass map
   useEffect(() => {
@@ -116,10 +134,24 @@ export default function PassMapComparison({
       setErrorRight(null);
 
       try {
-        const response = await fetch(`/api/player/${rightPlayerId}/pass-map?season=${selectedRightSeason}`);
+        // Build query string with optional week parameters
+        const queryParams = new URLSearchParams({ season: selectedRightSeason.toString() });
+        if (rightWeekStart !== null) {
+          queryParams.append('weekStart', rightWeekStart.toString());
+        }
+        if (rightWeekEnd !== null) {
+          queryParams.append('weekEnd', rightWeekEnd.toString());
+        }
+        
+        const response = await fetch(`/api/player/${rightPlayerId}/pass-map?${queryParams.toString()}`);
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Failed to fetch pass map data' }));
+          
+          if (errorData.isInvalidWeekRange) {
+            throw new Error(errorData.error || 'Invalid week range specified.');
+          }
+          
           throw new Error(errorData.error || 'Failed to fetch pass map data');
         }
 
@@ -133,13 +165,83 @@ export default function PassMapComparison({
     }
 
     fetchRightPassMap();
-  }, [rightPlayerId, selectedRightSeason]);
+  }, [rightPlayerId, selectedRightSeason, rightWeekStart, rightWeekEnd]);
 
   const handleStatsChange = (newStats: string[]) => {
     setSelectedStats(newStats);
   };
 
   const selectedStatOptions = AVAILABLE_STATS.filter(stat => selectedStats.includes(stat.key));
+
+  const weekOptions = Array.from({ length: 18 }, (_, i) => i + 1);
+
+  const handleLeftWeekStartChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const newWeekStart = value === '' ? null : Number(value);
+    
+    // Validate that weekStart <= weekEnd if both are set
+    if (newWeekStart !== null && leftWeekEnd !== null && newWeekStart > leftWeekEnd) {
+      setErrorLeft('Start week must be less than or equal to end week.');
+      return;
+    }
+    
+    setErrorLeft(null);
+    setLeftWeekStart(newWeekStart);
+  };
+
+  const handleLeftWeekEndChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const newWeekEnd = value === '' ? null : Number(value);
+    
+    // Validate that weekStart <= weekEnd if both are set
+    if (leftWeekStart !== null && newWeekEnd !== null && leftWeekStart > newWeekEnd) {
+      setErrorLeft('Start week must be less than or equal to end week.');
+      return;
+    }
+    
+    setErrorLeft(null);
+    setLeftWeekEnd(newWeekEnd);
+  };
+
+  const clearLeftWeekFilter = () => {
+    setLeftWeekStart(null);
+    setLeftWeekEnd(null);
+    setErrorLeft(null);
+  };
+
+  const handleRightWeekStartChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const newWeekStart = value === '' ? null : Number(value);
+    
+    // Validate that weekStart <= weekEnd if both are set
+    if (newWeekStart !== null && rightWeekEnd !== null && newWeekStart > rightWeekEnd) {
+      setErrorRight('Start week must be less than or equal to end week.');
+      return;
+    }
+    
+    setErrorRight(null);
+    setRightWeekStart(newWeekStart);
+  };
+
+  const handleRightWeekEndChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    const newWeekEnd = value === '' ? null : Number(value);
+    
+    // Validate that weekStart <= weekEnd if both are set
+    if (rightWeekStart !== null && newWeekEnd !== null && rightWeekStart > newWeekEnd) {
+      setErrorRight('Start week must be less than or equal to end week.');
+      return;
+    }
+    
+    setErrorRight(null);
+    setRightWeekEnd(newWeekEnd);
+  };
+
+  const clearRightWeekFilter = () => {
+    setRightWeekStart(null);
+    setRightWeekEnd(null);
+    setErrorRight(null);
+  };
 
   const renderPassMap = (
     passMapData: PassMapData | null,
@@ -148,7 +250,12 @@ export default function PassMapComparison({
     playerName: string,
     season: number,
     availableSeasons: number[],
-    onSeasonChange: (season: number) => void
+    onSeasonChange: (season: number) => void,
+    weekStart: number | null,
+    weekEnd: number | null,
+    onWeekStartChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
+    onWeekEndChange: (e: React.ChangeEvent<HTMLSelectElement>) => void,
+    onClearWeekFilter: () => void
   ) => {
     return (
       <div className="space-y-4">
@@ -169,6 +276,65 @@ export default function PassMapComparison({
               ))}
             </select>
           </div>
+        </div>
+        
+        {/* Week Range Filter */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+          <label className="block text-xs font-medium text-gray-700 mb-2">
+            Filter by Week Range (Optional)
+          </label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <label htmlFor={`weekStart-${playerName}`} className="block text-xs text-gray-600 mb-1">
+                Start Week
+              </label>
+              <select
+                id={`weekStart-${playerName}`}
+                value={weekStart || ''}
+                onChange={onWeekStartChange}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-xs"
+              >
+                <option value="">All Weeks</option>
+                {weekOptions.map(week => (
+                  <option key={week} value={week}>Week {week}</option>
+                ))}
+              </select>
+            </div>
+            <div className="text-gray-500 pt-5 text-xs">to</div>
+            <div className="flex-1">
+              <label htmlFor={`weekEnd-${playerName}`} className="block text-xs text-gray-600 mb-1">
+                End Week
+              </label>
+              <select
+                id={`weekEnd-${playerName}`}
+                value={weekEnd || ''}
+                onChange={onWeekEndChange}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-xs"
+              >
+                <option value="">All Weeks</option>
+                {weekOptions.map(week => (
+                  <option key={week} value={week}>Week {week}</option>
+                ))}
+              </select>
+            </div>
+            {(weekStart !== null || weekEnd !== null) && (
+              <button
+                onClick={onClearWeekFilter}
+                className="px-2 py-1.5 text-xs text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors mt-5"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          {(weekStart !== null || weekEnd !== null) && (
+            <p className="mt-2 text-xs text-gray-600">
+              Showing data for {weekStart !== null && weekEnd !== null 
+                ? `Weeks ${weekStart}-${weekEnd}`
+                : weekStart !== null 
+                  ? `Week ${weekStart} onwards`
+                  : `Weeks 1-${weekEnd}`}
+            </p>
+          )}
         </div>
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
@@ -272,7 +438,12 @@ export default function PassMapComparison({
             leftPlayerName, 
             selectedLeftSeason,
             leftAvailableSeasons,
-            setSelectedLeftSeason
+            setSelectedLeftSeason,
+            leftWeekStart,
+            leftWeekEnd,
+            handleLeftWeekStartChange,
+            handleLeftWeekEndChange,
+            clearLeftWeekFilter
           )}
         </div>
 
@@ -285,7 +456,12 @@ export default function PassMapComparison({
             rightPlayerName, 
             selectedRightSeason,
             rightAvailableSeasons,
-            setSelectedRightSeason
+            setSelectedRightSeason,
+            rightWeekStart,
+            rightWeekEnd,
+            handleRightWeekStartChange,
+            handleRightWeekEndChange,
+            clearRightWeekFilter
           )}
         </div>
       </div>

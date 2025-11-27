@@ -10,6 +10,7 @@ interface StatComparisonChartProps {
   position: string;
   season: number;
   statType: string;
+  showNames?: boolean;
 }
 
 interface ClusteredDataPoint {
@@ -25,6 +26,7 @@ export default function StatComparisonChart({
   position,
   season,
   statType,
+  showNames = false,
 }: StatComparisonChartProps) {
   const [data, setData] = useState<StatComparisonResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -209,7 +211,37 @@ export default function StatComparisonChart({
       .attr('text-anchor', 'middle')
       .text(data.metadata.statLabel);
 
-  }, [data, playerId, statType, position, season]);
+    if (showNames) {
+      const labelGroup = svg.append('g')
+        .selectAll('g')
+        .data(clusteredData)
+        .join('g')
+        .attr('transform', d => `translate(${xScale(d.x)},${yScale(d.y)})`);
+
+      labelGroup.append('rect')
+        .attr('x', 6)
+        .attr('y', -14)
+        .attr('width', d => {
+          const textLength = d.name.length;
+          return Math.max(textLength * 6.5, 50);
+        })
+        .attr('height', 16)
+        .attr('fill', 'white')
+        .attr('fill-opacity', 0.85)
+        .attr('stroke', '#ccc')
+        .attr('stroke-width', 0.5)
+        .attr('rx', 2);
+
+      labelGroup.append('text')
+        .attr('x', 8)
+        .attr('y', -2)
+        .attr('font-size', '12px') // Player name label font size - adjust this value to change text size
+        .attr('fill', '#333')
+        .attr('pointer-events', 'none')
+        .text(d => d.name);
+    }
+
+  }, [data, playerId, statType, position, season, showNames]);
 
   if (error) {
     return <div className="text-red-500">Error: {error}</div>;

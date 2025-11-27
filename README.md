@@ -5,16 +5,18 @@ A website for visualizing NFL player statistics. The main feature of this web ap
 **Official Website**: [https://nfl-stats-radar.com/](https://nfl-stats-radar.com/)
 
 ## Current Features
+- Weekly Power Rankings
 - Search for any NFL player (QB/RB/WR/TE) who has played since 1999
 - Player profiles with rankings in key statistics
 - Player comparison page
 - Visualizations:
   - Charts showing how a player's stats compare to the rest of the league
   - Percentile sliders for easy visual comparison (similar to Baseball Savant)
+  - Pass map visualizations for QBs (2010 - present)
 
 ## Future Features + Plans
-- Real-time customizable visualizations
-- Pass + Catch map visualizations for QBs and WRs
+- Live game scores and statistics
+- Catch map visualizations for WRs
 - Player radar charts (i.e. something similar to the classic attribute radar charts in FIFA)
 - Integration with a game simulation model
 
