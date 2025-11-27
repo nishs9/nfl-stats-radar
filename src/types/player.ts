@@ -131,6 +131,7 @@ export interface RPIRanking {
 
 export interface PowerRankingsResponse {
   rankings: RPIRanking[];
+  week?: number;
 }
 
 // Pass Map types

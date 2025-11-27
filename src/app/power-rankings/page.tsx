@@ -14,12 +14,38 @@ export default function PowerRankingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [sortColumn, setSortColumn] = useState<SortColumn>('rpi_rank');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
+  const [availableWeeks, setAvailableWeeks] = useState<number[]>([]);
+  const [currentWeek, setCurrentWeek] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchRankings() {
+    async function fetchAvailableWeeks() {
       try {
-        const response = await fetch('/api/power-rankings');
+        const response = await fetch('/api/power-rankings/weeks');
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableWeeks(data.weeks);
+        }
+      } catch (err) {
+        console.error('Error fetching available weeks:', err);
+      }
+    }
+
+    fetchAvailableWeeks();
+  }, []);
+
+  useEffect(() => {
+    async function fetchRankings() {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const url = selectedWeek 
+          ? `/api/power-rankings?week=${selectedWeek}`
+          : '/api/power-rankings';
+        
+        const response = await fetch(url);
         
         if (!response.ok) {
           throw new Error('Failed to fetch power rankings');
@@ -27,6 +53,7 @@ export default function PowerRankingsPage() {
         
         const data: PowerRankingsResponse = await response.json();
         setRankings(data.rankings);
+        setCurrentWeek(data.week || null);
       } catch (err) {
         setError('Error loading power rankings. Please try again.');
         console.error('Error fetching power rankings:', err);
@@ -36,7 +63,7 @@ export default function PowerRankingsPage() {
     }
 
     fetchRankings();
-  }, []);
+  }, [selectedWeek]);
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -110,7 +137,28 @@ export default function PowerRankingsPage() {
         </button>
         
         <h1 className="text-3xl font-bold mb-2">NFL Power Rankings</h1>
-        <p className="text-gray-600">Power rankings based on Composite Rating Percentage Index (Composite RPI) for the 2025 season</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <p className="text-gray-600">Power rankings based on Composite Rating Percentage Index (Composite RPI) for the 2025 season</p>
+          
+          {availableWeeks.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label htmlFor="week-select" className="text-sm font-medium text-gray-700">
+                Week:
+              </label>
+              <select
+                id="week-select"
+                value={selectedWeek || ''}
+                onChange={(e) => setSelectedWeek(e.target.value === '' ? null : Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="">Latest</option>
+                {availableWeeks.map((week) => (
+                  <option key={week} value={week}>Week {week}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Info Section */}
@@ -119,6 +167,7 @@ export default function PowerRankingsPage() {
         <p className="text-sm text-blue-800">
           Composite RPI is my own version of <a href="https://en.wikipedia.org/wiki/Rating_percentage_index" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600">Rating Percentage Index (RPI)</a> that 
           takes recent form and margin of victory into account along with record and strength of schedule. A higher Composite RPI indicates a stronger team. These rankings will be updated weekly.
+          {currentWeek && <span className="block mt-2 font-semibold">Showing rankings for Week {currentWeek}</span>}
         </p>
       </div>
 
