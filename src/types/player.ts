@@ -122,6 +122,8 @@ export interface RPIRanking {
   team_name: string;
   team_logo_squared: string;
   games_played: number;
+  wins: number;
+  losses: number;
   win_pct: number;
   comp_rpi: number;
   rpi_rank: number;

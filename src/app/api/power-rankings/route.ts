@@ -12,6 +12,8 @@ export async function GET() {
         t.team_name,
         t.team_logo_squared,
         r.games_played,
+        r.wins,
+        r.losses,
         r.win_pct,
         round(r.comp_rpi * 100, 3) as comp_rpi,
         r.rpi_rank

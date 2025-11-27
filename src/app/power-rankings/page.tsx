@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { RPIRanking, PowerRankingsResponse } from '@/types/player';
 
-type SortColumn = 'rpi_rank' | 'games_played' | 'win_pct' | 'comp_rpi';
+type SortColumn = 'rpi_rank' | 'wins' | 'losses' | 'games_played' | 'win_pct' | 'comp_rpi';
 type SortDirection = 'asc' | 'desc';
 
 export default function PowerRankingsPage() {
@@ -149,6 +149,24 @@ export default function PowerRankingsPage() {
                     <SortIcon column="games_played" />
                   </div>
                 </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 cursor-pointer hover:bg-gray-100 select-none"
+                  onClick={() => handleSort('wins')}
+                >
+                  <div className="flex items-center">
+                    Wins
+                    <SortIcon column="wins" />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 cursor-pointer hover:bg-gray-100 select-none"
+                  onClick={() => handleSort('losses')}
+                >
+                  <div className="flex items-center">
+                    Losses
+                    <SortIcon column="losses" />
+                  </div>
+                </th>
                 <th 
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 cursor-pointer hover:bg-gray-100 select-none"
                   onClick={() => handleSort('win_pct')}
@@ -208,6 +226,12 @@ export default function PowerRankingsPage() {
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 border-b border-gray-100">
                     {ranking.games_played}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 border-b border-gray-100">
+                    {ranking.wins}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 border-b border-gray-100">
+                    {ranking.losses}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 border-b border-gray-100">
                     {formatWinPct(ranking.win_pct)}
