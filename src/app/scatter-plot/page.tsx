@@ -117,7 +117,7 @@ export default function ScatterPlotPage() {
         
         <h1 className="text-3xl font-bold mb-2">NFL Stats Scatter Plot</h1>
         <p className="text-gray-600">
-          Create a scatter plot from various offensive player statistics. Hover on a point for more details. Click on a point to view the player's profile page.
+          Create a scatter plot from various offensive player statistics. Hover on a point for more details. Click on a point to view the player&apos;s profile page.
         </p>
       </div>
 
