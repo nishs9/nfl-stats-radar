@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const db = await getDbConnection();
     
     let query: string;
-    let params: any[] = [];
+    let params: string[] = [];
     
     if (teamsParam) {
       const teams = teamsParam.split(',').map(t => t.trim()).filter(t => t);
