@@ -94,8 +94,6 @@ export default function ScatterPlot({
       .range([height, 0])
       .nice();
 
-    const positions = Array.from(new Set(validData.map(d => d.position)));
-
     const xTicks = xScale.ticks();
     const yTicks = yScale.ticks();
 
