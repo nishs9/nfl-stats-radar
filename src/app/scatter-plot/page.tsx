@@ -31,11 +31,10 @@ export default function ScatterPlotPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Form state
   const [season, setSeason] = useState<number>(2024);
-  const [xStat, setXStat] = useState<string>('passing_yards');
-  const [yStat, setYStat] = useState<string>('passing_tds');
-  const [selectedPositions, setSelectedPositions] = useState<string[]>(['QB', 'RB', 'WR', 'TE']); // Default to all positions
+  const [xStat, setXStat] = useState<string>('passing_epa');
+  const [yStat, setYStat] = useState<string>('rushing_epa');
+  const [selectedPositions, setSelectedPositions] = useState<string[]>(['QB']);
   const [availableStats, setAvailableStats] = useState<string[]>([]);
   const [showNames, setShowNames] = useState<boolean>(false);
 
@@ -48,7 +47,7 @@ export default function ScatterPlotPage() {
     async function fetchAvailableStats() {
       try {
         // Make a dummy request just to get available stats
-        const response = await fetch('/api/scatter-plot?season=2024&xStat=passing_yards&yStat=passing_tds');
+        const response = await fetch(`/api/scatter-plot?season=${season}&xStat=${xStat}&yStat=${yStat}`);
         if (response.ok) {
           const result: ScatterPlotResponse = await response.json();
           setAvailableStats(result.availableStats);
@@ -99,7 +98,8 @@ export default function ScatterPlotPage() {
     fetchData();
   }, [season, xStat, yStat, selectedPositions, availableStats.length]);
 
-  // Format stat name for display
+  // Format column name for display
+  // TODO: Improve this with a proper column name mapping
   const formatStatName = (stat: string): string => {
     return stat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
@@ -144,7 +144,7 @@ export default function ScatterPlotPage() {
           {/* X-Axis Stat Selector */}
           <div>
             <label htmlFor="xStat" className="block text-sm font-medium text-gray-700 mb-2">
-              X-Axis Stat
+              X-Axis
             </label>
             <select
               id="xStat"
@@ -165,7 +165,7 @@ export default function ScatterPlotPage() {
           {/* Y-Axis Stat Selector */}
           <div>
             <label htmlFor="yStat" className="block text-sm font-medium text-gray-700 mb-2">
-              Y-Axis Stat
+              Y-Axis
             </label>
             <select
               id="yStat"
@@ -185,7 +185,7 @@ export default function ScatterPlotPage() {
         </div>
 
         {/* Position Filter Checkboxes */}
-        <div className="pt-4 border-t border-gray-200">
+        <div className="pt-4 border-t border-gray-200 mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Position Filter
           </label>
@@ -275,17 +275,6 @@ export default function ScatterPlotPage() {
           <p className="text-gray-600">No data available for the selected filters.</p>
         </div>
       ) : null}
-
-      {/* Info Section */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-base font-semibold text-blue-900 mb-2">About Scatter Plots</h3>
-        <ul className="list-disc list-inside space-y-1 text-sm text-blue-800">
-          <li>Each point represents a player from the selected season</li>
-          <li>Points are colored by position</li>
-          <li>Hover over points to see player details</li>
-          <li>You can filter by position or view all positions together</li>
-        </ul>
-      </div>
     </div>
   );
 }
