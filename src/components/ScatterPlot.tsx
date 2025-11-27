@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import * as d3 from 'd3';
 
 interface ScatterPlotDataPoint {
@@ -38,26 +39,26 @@ export default function ScatterPlot({
   dataPoints,
   xStat,
   yStat,
+  season,
   showNames = false,
 }: ScatterPlotProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!dataPoints || dataPoints.length === 0 || !svgRef.current || !tooltipRef.current) return;
 
-    // Clear previous chart
+    // Clear any previous chart
     d3.select(svgRef.current).selectAll('*').remove();
 
-    // Chart dimensions
-    const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+    const margin = { top: 40, right: 20, bottom: 60, left: 20 };
     const containerWidth = containerRef.current?.clientWidth || 800;
     const containerHeight = containerRef.current?.clientHeight || 600;
     const width = Math.min(containerWidth - margin.left - margin.right, 1200);
     const height = containerHeight - margin.top - margin.bottom;
 
-    // Create SVG
     const svg = d3.select(svgRef.current)
       .attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
       .append('g')
@@ -76,7 +77,7 @@ export default function ScatterPlot({
       return;
     }
 
-    // Create scales
+    // Create axis scales
     const xScale = d3.scaleLinear()
       .domain([
         d3.min(validData, d => d.xValue as number) || 0,
@@ -93,17 +94,12 @@ export default function ScatterPlot({
       .range([height, 0])
       .nice();
 
-    // Color scale by position
     const positions = Array.from(new Set(validData.map(d => d.position)));
-    const colorScale = d3.scaleOrdinal<string>()
-      .domain(positions)
-      .range(d3.schemeCategory10);
 
-    // Add grid lines
     const xTicks = xScale.ticks();
     const yTicks = yScale.ticks();
 
-    // Vertical grid lines
+    // Vertical grid
     svg.append('g')
       .attr('class', 'grid')
       .selectAll('line')
@@ -111,13 +107,12 @@ export default function ScatterPlot({
       .join('line')
       .attr('x1', d => xScale(d))
       .attr('x2', d => xScale(d))
-      .attr('y1', 0)
-      .attr('y2', height)
+      .attr('y1', -10)
+      .attr('y2', height + 10)
       .attr('stroke', '#e5e5e5')
-      .attr('stroke-dasharray', '2,2')
-      .attr('stroke-width', 1);
+      .attr('stroke-dasharray', '2,2');
 
-    // Horizontal grid lines
+    // Horizontal grid
     svg.append('g')
       .attr('class', 'grid')
       .selectAll('line')
@@ -128,16 +123,15 @@ export default function ScatterPlot({
       .attr('y1', d => yScale(d))
       .attr('y2', d => yScale(d))
       .attr('stroke', '#e5e5e5')
-      .attr('stroke-dasharray', '2,2')
-      .attr('stroke-width', 1);
+      .attr('stroke-dasharray', '2,2');
 
-    // Add axes
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
 
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(xAxis)
+      .call(g => g.select('.domain').attr('stroke', '#e5e5e5'))
       .append('text')
       .attr('x', width / 2)
       .attr('y', 45)
@@ -149,8 +143,11 @@ export default function ScatterPlot({
 
     svg.append('g')
       .call(yAxis)
-      .append('text')
-      .attr('transform', 'rotate(-90)')
+      .call(g => g.select('.domain').attr('stroke', '#e5e5e5'));
+
+    // Add y-axis label separately (not appended to axis group to avoid clipping)
+    svg.append('text')
+      .attr('transform', `rotate(-90)`)
       .attr('y', -45)
       .attr('x', -height / 2)
       .attr('fill', '#333')
@@ -166,80 +163,89 @@ export default function ScatterPlot({
       .join('circle')
       .attr('cx', d => xScale(d.xValue as number))
       .attr('cy', d => yScale(d.yValue as number))
-      .attr('r', 4)
-      .attr('fill', d => colorScale(d.position))
-      .attr('opacity', 0.7)
-      .attr('stroke', '#fff')
+      .attr('r', 6)
+      .attr('fill', '#3b82f6')
+      .attr('stroke', '#2563eb')
       .attr('stroke-width', 1)
-      .style('cursor', 'pointer');
+      .style('cursor', 'pointer')
+      .on('click', (event, d) => {
+        // Navigate to the clicked player's profile page with the season as a query parameter
+        router.push(`/player/${d.playerId}?season=${season}`);
+      });
 
     // Add hover interactions
     const tooltip = d3.select(tooltipRef.current)
-      .style('opacity', 0)
       .style('position', 'absolute')
-      .style('background', 'rgba(0, 0, 0, 0.8)')
+      .style('visibility', 'hidden')
+      .style('background-color', 'rgba(0, 0, 0, 0.8)')
       .style('color', 'white')
-      .style('padding', '8px')
+      .style('padding', '10px')
       .style('border-radius', '4px')
-      .style('pointer-events', 'none')
-      .style('font-size', '12px')
+      .style('font-size', '14px') 
       .style('z-index', '1000');
 
     points
       .on('mouseover', function(event, d) {
         d3.select(this)
-          .attr('r', 6)
-          .attr('opacity', 1);
+          .attr('r', 8)
+          .attr('stroke-width', 2);
 
         const xStatLabel = escapeHtml(xStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
         const yStatLabel = escapeHtml(yStat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
         
         tooltip
-          .style('opacity', 1)
+          .style('visibility', 'visible')
           .html(`
-            <strong>${escapeHtml(d.playerName)}</strong><br/>
-            ${escapeHtml(d.position)} - ${escapeHtml(d.team)}<br/>
-            ${xStatLabel}: ${escapeHtml(d.xValue?.toLocaleString())}<br/>
-            ${yStatLabel}: ${escapeHtml(d.yValue?.toLocaleString())}
+            <div class="font-bold">${escapeHtml(d.playerName)}</div>
+            <div>${escapeHtml(d.position)} - ${escapeHtml(d.team)}</div>
+            <div>${xStatLabel}: ${escapeHtml(d.xValue?.toLocaleString())}</div>
+            <div>${yStatLabel}: ${escapeHtml(d.yValue?.toLocaleString())}</div>
           `);
       })
       .on('mousemove', function(event) {
+        if (!tooltipRef.current || !containerRef.current) return;
+
+        const tooltipWidth = tooltipRef.current.offsetWidth;
+        const tooltipHeight = tooltipRef.current.offsetHeight;
+        const containerRect = containerRef.current.getBoundingClientRect();
+        
+        // Get mouse position relative to viewport
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        
+        // Calculate position relative to container (accounting for padding)
+        let xPos = mouseX - containerRect.left + 15;
+        let yPos = mouseY - containerRect.top - tooltipHeight - 15;
+
+        // Adjust if tooltip would overflow right edge
+        if (xPos + tooltipWidth > containerRect.width - 16) {
+          xPos = mouseX - containerRect.left - tooltipWidth - 15;
+        }
+
+        // Adjust if tooltip would overflow top edge
+        if (yPos < 16) { // Account for padding
+          yPos = mouseY - containerRect.top + 15;
+        }
+
+        // Adjust if tooltip would overflow bottom edge
+        if (yPos + tooltipHeight > containerRect.height - 16) {
+          yPos = containerRect.height - tooltipHeight - 16;
+        }
+
+        xPos = Math.max(16, xPos);
+
         tooltip
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY - 10}px`);
+          .style('left', `${xPos}px`)
+          .style('top', `${yPos}px`);
       })
       .on('mouseout', function() {
         d3.select(this)
-          .attr('r', 4)
-          .attr('opacity', 0.7);
+          .attr('r', 6)
+          .attr('stroke-width', 1);
 
-        tooltip.style('opacity', 0);
+        tooltip.style('visibility', 'hidden');
       });
 
-    // Add legend
-    const legend = svg.append('g')
-      .attr('transform', `translate(${width - 100}, 20)`);
-
-    const legendItems = legend.selectAll('.legend-item')
-      .data(positions)
-      .join('g')
-      .attr('class', 'legend-item')
-      .attr('transform', (d, i) => `translate(0, ${i * 20})`);
-
-    legendItems.append('circle')
-      .attr('r', 4)
-      .attr('fill', d => colorScale(d))
-      .attr('cx', 0)
-      .attr('cy', 0);
-
-    legendItems.append('text')
-      .attr('x', 8)
-      .attr('y', 4)
-      .attr('font-size', '11px')
-      .attr('fill', '#333')
-      .text(d => d);
-
-    // Add player name labels if showNames is true
     if (showNames) {
       const labelGroup = svg.append('g')
         .selectAll('g')
@@ -247,16 +253,14 @@ export default function ScatterPlot({
         .join('g')
         .attr('transform', d => `translate(${xScale(d.xValue as number)},${yScale(d.yValue as number)})`);
 
-      // Add background rectangles for better readability
       labelGroup.append('rect')
         .attr('x', 6)
-        .attr('y', -12)
+        .attr('y', -14)
         .attr('width', d => {
-          // Estimate width based on text length
           const textLength = d.playerName.length;
-          return Math.max(textLength * 5.5, 40);
+          return Math.max(textLength * 6.5, 50); // Increased width multiplier for larger font
         })
-        .attr('height', 14)
+        .attr('height', 16) // Increased height for larger font
         .attr('fill', 'white')
         .attr('fill-opacity', 0.85)
         .attr('stroke', '#ccc')
@@ -266,19 +270,23 @@ export default function ScatterPlot({
       // Add text labels
       labelGroup.append('text')
         .attr('x', 8)
-        .attr('y', -3)
-        .attr('font-size', '10px')
+        .attr('y', -2) // Adjusted y position for better centering with larger font
+        .attr('font-size', '12px') // Player name label font size - adjust this value to change text size
         .attr('fill', '#333')
         .attr('pointer-events', 'none')
         .text(d => d.playerName);
     }
 
-  }, [dataPoints, xStat, yStat, showNames]);
+  }, [dataPoints, xStat, yStat, season, showNames, router]);
 
   return (
-    <div className="w-full" ref={containerRef} style={{ minHeight: '600px' }}>
-      <svg ref={svgRef} className="w-full" style={{ minHeight: '600px' }} />
-      <div ref={tooltipRef} />
+    <div ref={containerRef} className="relative w-full h-[600px] max-w-[95vw] mx-auto bg-white rounded-lg shadow-lg p-4">
+      <svg 
+        ref={svgRef} 
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid meet"
+      />
+      <div ref={tooltipRef} className="pointer-events-none absolute" />
     </div>
   );
 }

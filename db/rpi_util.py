@@ -13,6 +13,17 @@ pd.options.mode.chained_assignment = None  # default='warn'
 def calculate_smoothed_win_pct(wins: int, games: int, alpha: float = 0.5, beta: float = 0.5) -> float:
     return (wins + alpha) / (games + alpha + beta)
 
+def compute_historical_rpi(schedule_df: pd.DataFrame, max_week: int) -> pd.DataFrame:
+    rpi_df_list = []
+    for week in range(1, max_week + 1):
+        print(f"Computing Historical RPI for week {week}")
+        week_df = schedule_df[schedule_df['week'] <= week]
+        rpi_df = compute_rpi_from_schedule(week_df, week)
+        rpi_df["week"] = week
+        rpi_df["rpi_rank"] = rpi_df["comp_rpi"].rank(ascending=False).astype(int)
+        rpi_df_list.append(rpi_df)
+    return pd.concat(rpi_df_list, ignore_index=True)
+
 def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.DataFrame:
     # ---- Expand schedule into team-centric view ----
     home_df = schedule_df[['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']]
@@ -42,6 +53,7 @@ def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.Da
 
     teams = games_df['team'].unique()
     results = []
+    team_records = {} # win-loss record for each team as a tuple (W, L)
 
     # ---- Compute standard and recency-weighted win% (WP) for each team ----
     team_wp = {}
@@ -55,6 +67,7 @@ def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.Da
         team_wp[team] = wp
         team_wp_r[team] = wp_r
         team_wp_mov[team] = wp_mov
+        team_records[team] = (t_games['win'].sum(), len(t_games) - t_games['win'].sum())
 
     # ---- Compute average win percentage of opponents (OWP) ----
     team_owp = {}
@@ -74,6 +87,10 @@ def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.Da
                 opp_wp_values.append(opp_wp)
                 opp_wp_r_values.append(opp_wp_r)
                 opp_wp_mov_values.append(opp_wp_mov)
+            else:
+                opp_wp_values.append(0.5)
+                opp_wp_r_values.append(0.5)
+                opp_wp_mov_values.append(0.5)
 
         team_owp[team] = np.mean(opp_wp_values)
         team_owp_r[team] = np.mean(opp_wp_r_values)
@@ -102,6 +119,8 @@ def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.Da
         results.append({
             'team': team,
             'games_played': games_played,
+            'wins': team_records[team][0],
+            'losses': team_records[team][1],
             'win_pct': team_wp[team],
             'opp_win_pct': team_owp[team],
             'opp_opp_win_pct': team_oowp[team],

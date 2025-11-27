@@ -22,6 +22,7 @@ type ClientProps = {
 function ClientComponent({ playerId, season, statType }: ClientProps) {
   const [playerInfo, setPlayerInfo] = useState<Player | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showNames, setShowNames] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPlayerInfo = async () => {
@@ -50,12 +51,27 @@ function ClientComponent({ playerId, season, statType }: ClientProps) {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Toggle for showing names */}
+      <div className="mb-4 flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="showNames"
+          checked={showNames}
+          onChange={(e) => setShowNames(e.target.checked)}
+          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label htmlFor="showNames" className="text-sm font-medium text-gray-700 cursor-pointer">
+          Show player names on plot
+        </label>
+      </div>
+      
       <Suspense fallback={<LoadingSpinner />}>
         <StatComparisonChart
           playerId={playerId}
           position={playerInfo.position}
           season={parseInt(season)}
           statType={statType}
+          showNames={showNames}
         />
       </Suspense>
     </div>

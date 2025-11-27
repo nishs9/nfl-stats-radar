@@ -250,7 +250,7 @@ export default function ScatterPlotPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       ) : data && data.dataPoints.length > 0 ? (
-        <div className="bg-white shadow-lg rounded-lg p-6">
+        <div>
           <div className="mb-4">
             <h2 className="text-xl font-semibold">
               {formatStatName(xStat)} vs {formatStatName(yStat)} ({season})
