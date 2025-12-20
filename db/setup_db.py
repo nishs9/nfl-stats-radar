@@ -25,7 +25,8 @@ class TqdmCallback:
 def upload_db_to_r2():
     part_size = 64 * 1024 * 1024
     config = TransferConfig(
-        multipart_threshold=part_size,
+        ## TODO: temp workaround; should probably revisit this later 
+        multipart_threshold=1,
         multipart_chunksize=part_size,
         max_concurrency=8,
         use_threads=True,
@@ -183,8 +184,8 @@ def create_database(conn: sqlite3.Connection):
     print("Database setup complete!")
 
 if __name__ == "__main__":
-    conn = sqlite3.connect('nfl_stats.db')
-    create_database_online(conn)
-    conn.commit()
-    conn.close() 
+    #conn = sqlite3.connect('nfl_stats.db')
+    #create_database_online(conn)
+    #conn.commit()
+    #conn.close() 
     upload_db_to_r2()
