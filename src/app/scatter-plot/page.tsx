@@ -31,7 +31,7 @@ export default function ScatterPlotPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [season, setSeason] = useState<number>(2024);
+  const [season, setSeason] = useState<number>(2026);
   const [xStat, setXStat] = useState<string>('passing_epa');
   const [yStat, setYStat] = useState<string>('rushing_epa');
   const [selectedPositions, setSelectedPositions] = useState<string[]>(['QB']);
@@ -39,7 +39,7 @@ export default function ScatterPlotPage() {
   const [showNames, setShowNames] = useState<boolean>(false);
 
   // Available seasons
-  const seasons = Array.from({ length: 2025 - 1999 + 1 }, (_, i) => 2025 - i);
+  const seasons = Array.from({ length: 2026 - 1999 + 1 }, (_, i) => 2026 - i);
   const positions = ['QB', 'RB', 'WR', 'TE'];
 
   // Fetch available stats on mount

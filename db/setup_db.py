@@ -79,18 +79,18 @@ def generate_derived_column_stats(df: pd.DataFrame, year: int, is_week_data: boo
 
 def get_player_stats_season_data() -> dict[int, pd.DataFrame]:
     player_stats_data_df_list = {}
-    for year in range(1999, 2026):
+    for year in range(1999, 2027):
         print(f"Downloading player season stats for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/player_stats/player_stats_season_{year}.csv.gz'
-        if year == 2025:
-            base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_regpost_{year}.csv.gz'
+        if year >= 2025:
+            base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_reg_{year}.csv.gz'
         raw_player_stats_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
         player_stats_data_df_list[year] = raw_player_stats_data
     return player_stats_data_df_list
 
 def get_player_stats_week_data() -> dict[int, pd.DataFrame]:
     player_stats_data_df_list = {}
-    for year in range(1999, 2026):
+    for year in range(1999, 2027):
         print(f"Downloading player weekly stats for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_{year}.csv.gz'
         raw_player_stats_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
@@ -99,7 +99,7 @@ def get_player_stats_week_data() -> dict[int, pd.DataFrame]:
 
 def get_play_by_play_data() -> dict[int, pd.DataFrame]:
     play_by_play_data_df_list = {}
-    for year in range(2010, 2026):
+    for year in range(2010, 2027):
         print(f"Downloading play by play data for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_{year}.csv.gz'
         raw_play_by_play_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
@@ -110,11 +110,16 @@ def get_play_by_play_data() -> dict[int, pd.DataFrame]:
 def create_database_online(conn: sqlite3.Connection):
     cursor = conn.cursor()
 
+    # Get team data (general team info, colors, logos)
+    teams_url = f'https://github.com/nflverse/nflverse-data/releases/download/teams/teams_colors_logos.csv.gz'
+    teams_df = pd.read_csv(teams_url, compression="gzip", low_memory=False)
+    teams_df = teams_df.to_sql("teams_colors_logos", conn, if_exists='replace', index=False)
+
     # Prepare schedule data for RPI calculations
     base_url = 'https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv.gz'
     schedule_df = pd.read_csv(base_url, compression='gzip', low_memory=False)
-    schedule_df = schedule_df[(schedule_df['season'] == 2025) & ~(schedule_df['home_score'].isna())]
-    max_week = schedule_df['week'].max()
+    schedule_df = schedule_df[(schedule_df['season'] == 2026) & (schedule_df['game_type'] == "REG")]
+    max_week = 1
 
     # Calculate historical RPI data for each team and add it to the DB
     historical_rpi_df = rpi_util.compute_historical_rpi(schedule_df, max_week)
@@ -184,8 +189,8 @@ def create_database(conn: sqlite3.Connection):
     print("Database setup complete!")
 
 if __name__ == "__main__":
-    #conn = sqlite3.connect('nfl_stats.db')
-    #create_database_online(conn)
-    #conn.commit()
-    #conn.close() 
+    # conn = sqlite3.connect('nfl_stats.db')
+    # create_database_online(conn)
+    # conn.commit()
+    # conn.close()
     upload_db_to_r2()

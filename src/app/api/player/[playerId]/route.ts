@@ -20,7 +20,7 @@ export async function GET(
 
     const db = await getDbConnection();
 
-    const years = Array.from({ length: 2025 - 1999 + 1 }, (_, i) => 2025 - i);
+    const years = Array.from({ length: 2026 - 1999 + 1 }, (_, i) => 2026 - i);
 
     const playerInfoUnionQueries = years
       .map(
