@@ -21,7 +21,7 @@ export async function GET(
 
     const seasonYear = Number(season);
 
-    if (seasonYear > 2025) {
+    if (seasonYear > 2026) {
       return NextResponse.json({ 
         error: 'Game logs are not available for future seasons',
         isFuture: true

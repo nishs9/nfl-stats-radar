@@ -61,9 +61,9 @@ export async function GET(request: NextRequest) {
     }
 
     const seasonYear = Number(season);
-    if (isNaN(seasonYear) || seasonYear < 1999 || seasonYear > 2025) {
+    if (isNaN(seasonYear) || seasonYear < 1999 || seasonYear > 2026) {
       return NextResponse.json(
-        { error: 'Invalid season. Must be between 1999 and 2025' },
+        { error: 'Invalid season. Must be between 1999 and 2065' },
         { status: 400 }
       );
     }

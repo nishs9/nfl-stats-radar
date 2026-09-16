@@ -193,7 +193,7 @@ export default function PowerRankingsPage() {
         
         <h1 className="text-3xl font-bold mb-2">NFL Power Rankings</h1>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <p className="text-gray-600">Power rankings based on Composite Rating Percentage Index (Composite RPI) for the 2025 season</p>
+          <p className="text-gray-600">Power rankings based on Composite Rating Percentage Index (Composite RPI) for the 2026 season</p>
           
           <div className="flex items-center gap-4">
             {viewMode === 'table' && availableWeeks.length > 0 && (

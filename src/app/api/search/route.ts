@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
       WITH RankedPlayers AS (
         SELECT player_id, player_display_name, recent_team, season,
                ROW_NUMBER() OVER (PARTITION BY player_id ORDER BY season DESC) as rn
-        FROM (
-           SELECT player_id, player_display_name, recent_team, 2025 as season FROM player_stats_season_2025
+        FROM ( SELECT player_id, player_display_name, recent_team, 2026 as season FROM player_stats_season_2026
+          UNION ALL SELECT player_id, player_display_name, recent_team, 2025 FROM player_stats_season_2025
           UNION ALL SELECT player_id, player_display_name, recent_team, 2024 FROM player_stats_season_2024
           UNION ALL SELECT player_id, player_display_name, recent_team, 2023 FROM player_stats_season_2023
           UNION ALL SELECT player_id, player_display_name, recent_team, 2022 FROM player_stats_season_2022

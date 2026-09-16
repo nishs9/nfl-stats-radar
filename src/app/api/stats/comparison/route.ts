@@ -40,10 +40,10 @@ export async function GET(request: Request) {
     }
 
     const midSeasonStatQualifiers: Record<string, string> = {
-      'QB': "attempts > 10",
-      'RB': "carries > 10",
-      'WR': "receptions > 4",
-      'TE': "receptions > 3"
+      'QB': "attempts > 5",
+      'RB': "carries > 3",
+      'WR': "receptions > 2",
+      'TE': "receptions > 2"
     }
 
     // Get the stat definition to find its label
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     const statDef = statDefinitions.find(def => def.key === statType);
     const statLabel = statDef?.label || statType; // Fallback to key if label not found
 
-    const qualifier = season === 2025 ? midSeasonStatQualifiers[position] : statQualifiers[position]
+    const qualifier = season === 2026 ? midSeasonStatQualifiers[position] : statQualifiers[position]
 
     // Query to get the target player and qualifying players
     const query = `

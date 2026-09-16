@@ -155,7 +155,7 @@ export async function GET(
       }, { status: 400 });
     }
 
-    if (seasonYear > 2025) {
+    if (seasonYear > 2026) {
       return NextResponse.json({ 
         error: 'Pass map data is not available for future seasons',
         isFuture: true
