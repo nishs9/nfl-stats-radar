@@ -83,7 +83,7 @@ def get_player_stats_season_data() -> dict[int, pd.DataFrame]:
         print(f"Downloading player season stats for {year}")
         base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/player_stats/player_stats_season_{year}.csv.gz'
         if year >= 2025:
-            base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_regpost_{year}.csv.gz'
+            base_url_std = f'https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_reg_{year}.csv.gz'
         raw_player_stats_data = pd.read_csv(base_url_std, compression='gzip', low_memory=False)
         player_stats_data_df_list[year] = raw_player_stats_data
     return player_stats_data_df_list
