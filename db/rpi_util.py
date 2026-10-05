@@ -25,8 +25,9 @@ def compute_historical_rpi(schedule_df: pd.DataFrame, max_week: int) -> pd.DataF
     return pd.concat(rpi_df_list, ignore_index=True)
 
 def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.DataFrame:
-    # ---- Expand schedule into team-centric view ----
-    home_df = schedule_df[['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']]
+    # ---- Expand schedule into team-centric view and drop any unplayed games ----
+    played = schedule_df[schedule_df["home_score"].notna() & schedule_df["away_score"].notna()]
+    home_df = played[['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']]
     home_df["score_diff"] = home_df["home_score"] - home_df["away_score"]
     home_df = home_df.rename(columns={
         'home_team': 'team', 'away_team': 'opp',
@@ -34,7 +35,7 @@ def compute_rpi_from_schedule(schedule_df: pd.DataFrame, max_week: int) -> pd.Da
     })
     home_df['is_home'] = 1
 
-    away_df = schedule_df[['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']]
+    away_df = played[['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']]
     away_df["score_diff"] = away_df["away_score"] - away_df["home_score"]
     away_df = away_df.rename(columns={
         'away_team': 'team', 'home_team': 'opp',

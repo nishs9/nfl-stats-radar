@@ -5,6 +5,7 @@ import boto3
 import rpi_util
 from tqdm import tqdm
 from boto3.s3.transfer import TransferConfig
+from botocore.config import Config
 from pathlib import Path
 from r2_secrets import CF_R2_ACCOUNT_ID, CF_R2_ACCESS_KEY_ID, CF_R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_DB_FILE_NAME
 from constants import pbp_filter_columns
@@ -32,12 +33,21 @@ def upload_db_to_r2():
         use_threads=True,
     )
 
+    # boto3 >= 1.36 defaults to CRC32 checksums sent as aws-chunked trailers.
+    # R2 does not support that encoding and resets the TLS connection mid-part,
+    # which botocore reports as "SSL validation failed" / SSLEOFError.
+    client_config = Config(
+        request_checksum_calculation="when_required",
+        response_checksum_validation="when_required"
+    )
+
     s3 = boto3.client(
         's3',
         endpoint_url=S3_endpoint,
         aws_access_key_id=CF_R2_ACCESS_KEY_ID,
         aws_secret_access_key=CF_R2_SECRET_ACCESS_KEY,
         region_name='auto',
+        config=client_config,
     )
 
     size = os.path.getsize(R2_DB_FILE_NAME)
@@ -119,7 +129,7 @@ def create_database_online(conn: sqlite3.Connection):
     base_url = 'https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv.gz'
     schedule_df = pd.read_csv(base_url, compression='gzip', low_memory=False)
     schedule_df = schedule_df[(schedule_df['season'] == 2026) & (schedule_df['game_type'] == "REG")]
-    max_week = 1
+    max_week = 4
 
     # Calculate historical RPI data for each team and add it to the DB
     historical_rpi_df = rpi_util.compute_historical_rpi(schedule_df, max_week)
