@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(dataApiEndpoint, {
       cache: 'no-store',
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(5_000),
     })
 
     const responseBody = await response.text();
