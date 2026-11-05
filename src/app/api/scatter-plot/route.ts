@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     const dataApiBaseUrl = process.env.DATA_API_BASE_URL;
-    //constDataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
+    //const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
 
     if (!dataApiBaseUrl) {
       const errMsg = "Data API configuration is missing";
