@@ -6,26 +6,25 @@ export async function GET(
   { params }: { params: Promise<{ playerId: string }> }
 ) {
   try {
-    const fullParams = await params;
-    const playerId = fullParams.playerId;
     const dataApiBaseUrl = process.env.DATA_API_BASE_URL;
     // const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
-
-    if (!playerId) {
-      const errMsg = "Player ID is a required input!";
-      console.error(errMsg);
-      return NextResponse.json(
-        {error: errMsg},
-        {status: 400}
-      );
-    }
-    
     if (!dataApiBaseUrl) {
       const errMsg = "Data API configuration is missing";
       console.error(errMsg);
       return NextResponse.json(
         {error: errMsg},
         {status: 500}
+      );
+    }
+
+    const fullParams = await params;
+    const playerId = fullParams.playerId;
+    if (!playerId) {
+      const errMsg = "Player ID is a required input!";
+      console.error(errMsg);
+      return NextResponse.json(
+        {error: errMsg},
+        {status: 400}
       );
     }
     
