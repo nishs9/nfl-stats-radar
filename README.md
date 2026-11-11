@@ -1,6 +1,6 @@
 # NFL Stats Radar
 
-A website for visualizing NFL player statistics. The main feature of this web app is the ability to view the statistical profiles of all QBs, RBs, WRs, and TEs since 1999. The app is built using Next.js and Typescript. The backend consists of a simple SQLite DB that is made up of data from NFLverse's data repository (see References section for more info). I currently have the app deployed using Railway.
+A website for visualizing NFL player statistics. The main feature of this web app is the ability to view the statistical profiles of all QBs, RBs, WRs, and TEs since 1999. The app is built using Next.js and Typescript. The middleware reaches out to a separately hosted data API in order to retrieve player statistics and data for the various visualizations and rankings. I currently have the app deployed using Railway. It can be accessed at the link below.
 
 **Official Website**: [https://nfl-stats-radar.com/](https://nfl-stats-radar.com/)
 
@@ -34,8 +34,6 @@ A website for visualizing NFL player statistics. The main feature of this web ap
 git clone https://github.com/nishs9/nfl-stats-radar.git
 cd nfl-stats-radar
 ```
-*Note: I access the DB via a Cloudflare R2 bucket. You can generate the DB yourself via the setup script in the db folder and tweak the access logic within db.ts and initDb.ts based on your own implementation.* 
-
 
 2. Install dependencies:
 ```bash
@@ -65,6 +63,8 @@ docker build -t nfl-stats-radar .
 2. Run the container:
 ```bash
 docker run -p 8080:8080 nfl-stats-radar
+# OR
+docker run --rm --name nfl-stats-radar -p 8080:8080 --env-file <local env file> nfl-stats-radar
 ```
 
 ## License
@@ -72,6 +72,7 @@ docker run -p 8080:8080 nfl-stats-radar
 MIT
 
 ## References
+
 The data that NFL Stats Radar relies on comes from a public repo provided by nflverse. I use the player season stats data specifically for this project but the repo has even more detailed data from current and past seasons. All of this data can be accessed and downloaded from [here](https://github.com/nflverse/nflverse-data/releases).
 
 Here is a link to nflverse's main GitHub page as well: https://github.com/nflverse

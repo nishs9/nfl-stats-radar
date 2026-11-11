@@ -1,65 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDbConnection } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ playerId: string }> }
 ) {
   try {
-    const full_params = await params;
-    const playerId = full_params.playerId;
-    const searchParams = request.nextUrl.searchParams;
-    const season = searchParams.get('season');
+    const dataApiBaseUrl = process.env.DATA_API_BASE_URL;
+    // const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
+    if (!dataApiBaseUrl) {
+      const errMsg = "Data API configuration is missing";
+      console.error(errMsg);
+      return NextResponse.json(
+        {error: errMsg},
+        {status: 500}
+      );
+    }
 
+    const fullParams = await params;
+    const playerId = fullParams.playerId;
     if (!playerId) {
-      return NextResponse.json({ error: 'Player ID is required' }, { status: 400 });
+      const errMsg = "Player ID is a required input!";
+      console.error(errMsg);
+      return NextResponse.json(
+        {error: errMsg},
+        {status: 400}
+      );
     }
 
-    if (!season) {
-      return NextResponse.json({ error: 'Season is required' }, { status: 400 });
+    const rawQueryString = request.url.split("?")[1];
+    let dataApiEndpoint = null;
+    console.log(rawQueryString);
+    if (!rawQueryString || rawQueryString.length === 0) {
+      const errMsg = "Query string should not be empty/undefined!";
+      console.error(errMsg);
+      return NextResponse.json(
+        {error: errMsg},
+        {status: 400}
+      );
+    } else {
+      dataApiEndpoint = new URL(`/api/player/${playerId}/game-logs?${rawQueryString}`, dataApiBaseUrl);
     }
+    console.log(dataApiEndpoint);
 
-    const seasonYear = Number(season);
+    const response = await fetch(dataApiEndpoint, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10_000),
+    })
 
-    if (seasonYear > 2026) {
-      return NextResponse.json({ 
-        error: 'Game logs are not available for future seasons',
-        isFuture: true
-      }, { status: 400 });
-    }
-
-    const db = await getDbConnection();
-
-    const columnsToQuery = [
-      'week', 'opponent_team', 'completions', 'attempts', 'passing_air_yards', 'passing_yards', 
-      'passing_epa', 'passing_tds', 'comp_pct', 'sack_rate', 'rushing_epa', 'rushing_yards', 'receiving_epa', 
-      'receiving_yards', 'target_share', 'targets', 'air_yards_share', 'racr', 'wopr', 'total_turnovers', 
-      'fantasy_points_ppr', 'receptions', 'receiving_tds', 'receiving_yards_after_catch', 
-      'carries', 'rushing_tds', 'yac_pct', 'yards_per_carry', 'yards_per_target', 'passing_interceptions'
-    ];
-
-    const gameLogsQuery = `
-      SELECT ${columnsToQuery.join(', ')} 
-      FROM player_stats_week_${seasonYear} 
-      WHERE player_id = ? AND season_type = 'REG'
-      ORDER BY week DESC
-    `;
-
-    const gameLogs = await db.all(gameLogsQuery, [playerId]);
-
-    if (!gameLogs || gameLogs.length === 0) {
-      return NextResponse.json({
-        gameLogs: [],
-        season: seasonYear,
-        message: 'No game logs found for this player in the specified season'
-      });
-    }
-
-    return NextResponse.json({
-      gameLogs,
-      season: seasonYear
+    const responseBody = await response.text();
+  
+    return new NextResponse(responseBody, {
+      status: response.status,
+      headers: {
+        'Content-Type':
+          response.headers.get('content-type') ?? 'application-json',
+      },
     });
-
   } catch (error) {
     console.error('Game logs fetch error:', error);
     return NextResponse.json({ 
