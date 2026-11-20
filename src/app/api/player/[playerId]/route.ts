@@ -7,8 +7,8 @@ export async function GET(
 ) {
   try {
     const dataApiBaseUrl = process.env.DATA_API_BASE_URL;
-    // const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
-    if (!dataApiBaseUrl) {
+    const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
+    if (!dataApiBaseUrl || !dataApiAccessKey) {
       const errMsg = "Data API configuration is missing";
       console.error(errMsg);
       return NextResponse.json(
@@ -42,6 +42,7 @@ export async function GET(
     const response = await fetch(dataApiEndpoint, {
       cache: 'no-store',
       signal: AbortSignal.timeout(10_000),
+      headers: { Authorization: `Bearer ${dataApiAccessKey}` }
     })
 
     const responseBody = await response.text();

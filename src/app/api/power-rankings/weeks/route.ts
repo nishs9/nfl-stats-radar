@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const dataApiBaseUrl = process.env.DATA_API_BASE_URL;
-    //constDataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
+    const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
 
-    if (!dataApiBaseUrl) {
+    if (!dataApiBaseUrl || !dataApiAccessKey) {
       const errMsg = "Data API configuration is missing";
       console.error(errMsg);
       return NextResponse.json(
@@ -18,6 +18,7 @@ export async function GET() {
     const response = await fetch(dataApiEndpoint, {
       cache: 'no-store',
       signal: AbortSignal.timeout(10_000),
+      headers: { Authorization: `Bearer ${dataApiAccessKey}` }
     })
 
     const responseBody = await response.text();
@@ -25,8 +26,7 @@ export async function GET() {
     return new NextResponse(responseBody, {
       status: response.status,
       headers: {
-        'Content-Type':
-          response.headers.get('content-type') ?? 'application-json',
+        'Content-Type': response.headers.get('content-type') ?? 'application-json'
       },
     });
   } catch (error) {

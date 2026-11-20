@@ -5,9 +5,9 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const week = searchParams.get('week');
     const dataApiBaseUrl = process.env.DATA_API_BASE_URL;
-    //constDataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
+    const dataApiAccessKey = process.env.DATA_API_ACCESS_KEY;
 
-    if (!dataApiBaseUrl) {
+    if (!dataApiBaseUrl || !dataApiAccessKey) {
       const errMsg = "Data API configuration is missing";
       console.error(errMsg);
       return NextResponse.json(
@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
       const response = await fetch(dataApiEndpoint, {
         cache: 'no-store',
         signal: AbortSignal.timeout(10_000),
+        headers: { Authorization: `Bearer ${dataApiAccessKey}` }
       })
   
       const responseBody = await response.text();
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
       const response = await fetch(dataApiEndpoint, {
         cache: 'no-store',
         signal: AbortSignal.timeout(5_000),
+        headers: { Authorization: `Bearer ${dataApiAccessKey}` }
       })
   
       const responseBody = await response.text();
@@ -54,8 +56,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse(responseBody, {
         status: response.status,
         headers: {
-          'Content-Type':
-            response.headers.get('content-type') ?? 'application-json',
+          'Content-Type': response.headers.get('content-type') ?? 'application-json',
         },
       });
     }
