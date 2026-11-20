@@ -63,6 +63,7 @@ export default function PowerRankingsPage() {
           : '/api/power-rankings';
         
         const response = await fetch(url);
+        console.warn("RESPONSE: " + response)
         
         if (!response.ok) {
           throw new Error('Failed to fetch power rankings');
@@ -130,6 +131,8 @@ export default function PowerRankingsPage() {
       setSortDirection('asc');
     }
   };
+
+  console.log("RAW UNSORTED RANKINGS:", rankings);
 
   const sortedRankings = [...rankings].sort((a, b) => {
     const aValue = a[sortColumn];
